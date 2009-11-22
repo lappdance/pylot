@@ -1,0 +1,61 @@
+A proposal for a 4450 term project
+16 Nov 2009
+Jason Lapp 0652137
+
+
+OVERVIEW AND DELIVERABLES
+"Pylot" will be a Python module that exposes the Pilot library to Python.
+The objective is not to re-write Pilot in Python, but just to wrap the functions
+and objects and expose them as Python objects.
+The final deliverables will be the Pylot extension library, a series of unit tests
+to prove the wrapper's correctness, and a sample program to demonstrate the module
+in action.
+
+TEAM MEMBERS
+I shall work alone on writing this API, though I may end up asking Ben Kelly for
+language-wrapping help if the interop doesn't go as smoothly as I expect.
+
+3RD-PARTY LIBRARIES
+The raw Python-C API is fairly horrible, so I will generate the wrappers using
+SWIG (http://www.swig.org). I've done Python wrapping using Boost::Python before,
+but using Boost introduces a runtime dependency, and Boost is not yet a
+commonly installed library. SWIG only needs to exist on the development machine,
+and so the resulting library is more portable.
+SWIG does not exist on amdi yet, I will need to have it installed. SWIG is a
+commonly-used API generator, so it should be as simple as "apt-get install swig".
+
+TARGET PLATFORM
+Amdi. Lockhart does not have any MPI libraries installed, as far as I can tell.
+If I am incorrect, I may port to lockhart if I have time, but amdi is the priority.
+
+DEMONSTRABLE CODE
+Once the bindings are complete, I shall show them off by generating the SHA-1 sum
+for a directory of large and small files. The SHA-1 algorithm is publicly
+available, so I should have no problems implementing it in Python. Python already
+comes with a crypto library, so the correctness of my implementation is as simple
+as comparing it to Python's library version.
+
+UNIT TESTING
+Python comes with a unit-testing framework PyUnit, similar to JUnit. If I can,
+I'll use this framework to test the Python API. Otherwise, I'll simply write
+a Python script to test the API, and run it myself using
+"mpiexec -n xx pylot_test.py".
+I'm not entirely certain how to test the wrapping layer, because I'm unfamiliar
+with how SWIG generates the interface code. I may have to write some interface
+code myself, by hand, using the Python-C API in order to test that Python objects
+are being marshalled across languages properly.
+I will likely have to write some C code to test the Pilot C implementation when
+it sends Python objects across channels using PI_Read and PI_Write. CUnit is a
+JUnit-like framework for unit testing C code; I haven't used it before but it
+looks fairly straightforward.
+
+FALLBACK POSITION
+I will work on the API and unit tests before I write the SHA-1 generating program.
+If I run into a problem and the API takes more time to complete than I expected,
+I will simply show off the test suite instead of the SHA-1 sum, though it will
+be a much less exciting demonstration.
+
+POSSIBLE COLLABORATION WITH OTHERS
+Ben Kelly has proposed a similar project using Lua bindings, I may talk to him and
+see if he's interested in competing to see whose wrapper is faster. I'll adjust
+my sample program to produce the same result as his if he does.

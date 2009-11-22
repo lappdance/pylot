@@ -1,0 +1,62 @@
+==============================
+INSTALL instructions for Pilot
+==============================
+:date: 22 September 2009
+:version: Version 1.1
+
+Here's what you need to get Pilot compiled and installed:
+
+    * The Pilot source distribution of your choice
+    * Your favourite MPI implementation
+    * If you would like to run the unit tests, you will need CUnit (version 2.1 or higher)
+    * To generate and install the documentation, you will need Python (2.4 or higher) with Docutils, and Doxygen (1.5.6 or higher)
+
+
+Building Pilot
+==============
+
+Configure the Makefile
+----------------------
+
+    Change the variable PREFIX to point to the directory that you wish pilot to
+    be installed in. The pilot header files will be installed in
+    $(PREFIX)/include and the library will be installed in $(PREFIX)/lib. Note
+    that if these directories do not already exist, an attempt is made to create
+    them.
+
+    If your mpi compiler is not installed in a standard place, you will also
+    have to change the variable CC to point to the proper compiler.
+
+    Note that if you install Pilot to a non-standard directory, then you will
+    have to make sure that the install directory is in your include and library
+    path. You can use the mpicc -I and -L options to set those paths.
+
+Compile
+-------
+
+    Once the Makefile has been configured, you can run::
+
+        $ make
+        $ make install
+
+    For information on how to build and run the unit tests, see the README in
+    the "tests" directory.
+
+
+Installing the Manual Pages
+===========================
+
+    Pilot comes with a set of man pages to serve as reference material. These
+    man pages are in the "docs" directory. If you would like to install these
+    pages for system wide access, you can set the DOC_PREFIX variable in the
+    main Makefile and then run::
+
+        $ make install-man
+
+    If you would like to view these man pages without installing them, you can
+    change your MANPATH to include the "docs" directory. Alternatively, you can
+    run man in the current directory and point it to the docs like so::
+
+        $ man -M docs/man <page>
+
+    Where <page> is the man page you want to view.

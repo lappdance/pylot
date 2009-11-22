@@ -1,0 +1,869 @@
+.TH "pilot.h" 3 "10 Oct 2009" "Pilot" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+pilot.h \- Public header file for Pilot.  
+
+.PP
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'pilot_limits.h'\fP
+.br
+\fC#include <stddef.h>\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBPI_MAIN\fP   0"
+.br
+.RI "\fIAlias for the 'master' process, whose behavior is found in main(). \fP"
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef int(* \fBPI_WORK_FUNC\fP )(int, void *)"
+.br
+.ti -1c
+.RI "typedef struct OPAQUE \fBPI_PROCESS\fP"
+.br
+.ti -1c
+.RI "typedef struct OPAQUE \fBPI_CHANNEL\fP"
+.br
+.ti -1c
+.RI "typedef struct OPAQUE \fBPI_BUNDLE\fP"
+.br
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBPI_BUNUSE\fP { \fBPI_BROADCAST\fP, \fBPI_GATHER\fP, \fBPI_SELECT\fP }"
+.br
+.ti -1c
+.RI "enum \fBPI_COPYDIR\fP { \fBPI_SAME\fP, \fBPI_REVERSE\fP }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBPI_Configure\fP (int *argc, char ***argv)"
+.br
+.ti -1c
+.RI "\fBPI_PROCESS\fP * \fBPI_CreateProcess\fP (\fBPI_WORK_FUNC\fP f, int index, void *opt_pointer)"
+.br
+.ti -1c
+.RI "\fBPI_CHANNEL\fP * \fBPI_CreateChannel\fP (\fBPI_PROCESS\fP *from, \fBPI_PROCESS\fP *to)"
+.br
+.ti -1c
+.RI "\fBPI_BUNDLE\fP * \fBPI_CreateBundle\fP (enum \fBPI_BUNUSE\fP usage, \fBPI_CHANNEL\fP *const array[], int size)"
+.br
+.ti -1c
+.RI "\fBPI_CHANNEL\fP ** \fBPI_CopyChannels\fP (enum \fBPI_COPYDIR\fP direction, \fBPI_CHANNEL\fP *const array[], int size)"
+.br
+.ti -1c
+.RI "void \fBPI_SetName\fP (void *object, const char *name)"
+.br
+.ti -1c
+.RI "int \fBPI_StartAll\fP (void)"
+.br
+.ti -1c
+.RI "const char * \fBPI_GetName\fP (const void *object)"
+.br
+.ti -1c
+.RI "void \fBPI_Write\fP (\fBPI_CHANNEL\fP *c, const char *format,...)"
+.br
+.ti -1c
+.RI "void \fBPI_Read\fP (\fBPI_CHANNEL\fP *c, const char *format,...)"
+.br
+.ti -1c
+.RI "int \fBPI_Select\fP (\fBPI_BUNDLE\fP *b)"
+.br
+.ti -1c
+.RI "int \fBPI_ChannelHasData\fP (\fBPI_CHANNEL\fP *c)"
+.br
+.ti -1c
+.RI "int \fBPI_TrySelect\fP (\fBPI_BUNDLE\fP *b)"
+.br
+.ti -1c
+.RI "\fBPI_CHANNEL\fP * \fBPI_GetBundleChannel\fP (const \fBPI_BUNDLE\fP *b, int index)"
+.br
+.ti -1c
+.RI "int \fBPI_GetBundleSize\fP (const \fBPI_BUNDLE\fP *b)"
+.br
+.ti -1c
+.RI "void \fBPI_Broadcast\fP (\fBPI_BUNDLE\fP *b, const char *format,...)"
+.br
+.ti -1c
+.RI "void \fBPI_Gather\fP (\fBPI_BUNDLE\fP *b, const char *format,...)"
+.br
+.ti -1c
+.RI "void \fBPI_StartTime\fP (void)"
+.br
+.ti -1c
+.RI "double \fBPI_EndTime\fP (void)"
+.br
+.ti -1c
+.RI "void \fBPI_Log\fP (const char *text)"
+.br
+.ti -1c
+.RI "int \fBPI_IsLogging\fP (void)"
+.br
+.ti -1c
+.RI "void \fBPI_Abort\fP (const int errcode, const char *text, const char *file, const int line)"
+.br
+.ti -1c
+.RI "void \fBPI_StopMain\fP (int status)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "int \fBPI_QuietMode\fP"
+.br
+.ti -1c
+.RI "int \fBPI_CheckLevel\fP"
+.br
+.ti -1c
+.RI "int \fBPI_OnErrorReturn\fP"
+.br
+.ti -1c
+.RI "int \fBPI_Errno\fP"
+.br
+.ti -1c
+.RI "const char * \fBPI_CallerFile\fP"
+.br
+.ti -1c
+.RI "int \fBPI_CallerLine\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Public header file for Pilot. 
+
+\fBAuthor:\fP
+.RS 4
+John Douglas Carter 
+.PP
+Bill Gardner
+.RE
+.PP
+Provides prototypes for all functions used by Pilot application programmers. 
+.SH "Define Documentation"
+.PP 
+.SS "#define PI_MAIN   0"
+.PP
+Alias for the 'master' process, whose behavior is found in main(). 
+.PP
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef struct OPAQUE \fBPI_BUNDLE\fP"
+.PP
+.SS "typedef struct OPAQUE \fBPI_CHANNEL\fP"
+.PP
+.SS "typedef struct OPAQUE \fBPI_PROCESS\fP"
+.PP
+.SS "typedef int(* \fBPI_WORK_FUNC\fP)(int, void *)"
+.PP
+Function prototype for user defined worker functions.
+.PP
+Functions to be assigned to processes must match this prototype. The work function's return value will be output in the log, but has no other operational significance. The two arguments are supplied via PI_CreateProcess. 
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBPI_BUNUSE\fP"
+.PP
+Specifies which type of bundle to create. 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBPI_CreateBundle\fP 
+.RE
+.PP
+
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIPI_BROADCAST \fP\fP
+.TP
+\fB\fIPI_GATHER \fP\fP
+.TP
+\fB\fIPI_SELECT \fP\fP
+
+.SS "enum \fBPI_COPYDIR\fP"
+.PP
+Specifies which direction the channels should point after a copy operation. 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBPI_CopyChannels\fP 
+.RE
+.PP
+
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIPI_SAME \fP\fP
+.TP
+\fB\fIPI_REVERSE \fP\fP
+
+.SH "Function Documentation"
+.PP 
+.SS "void PI_Abort (const int errcode, const char * text, const char * file, const int line)"
+.PP
+Aborts execution of Pilot application.
+.PP
+Normally called by library functions when error detected, but can be called by user program that wants to exit abruptly. Prints message:
+.PP
+\fC*** PI_Abort *** (MPI process #N) Pilot process 'name'(arg), <file>:<line>: <errmsg><text>\fP
+.PP
+where errmsg is derived from errcode if it is in range for Pilot codes, otherwise '' (e.g., errcode 0 will suppress errmsg).
+.PP
+\fBParameters:\fP
+.RS 4
+\fIerrcode\fP The Pilot error code or 0 (zero). 
+.br
+\fItext\fP Extra message to display with the error message. 
+.br
+\fIfile\fP Should be filled in with \fC__FILE__\fP . 
+.br
+\fIline\fP Should be filled in with \fC__LINE__\fP .
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+The entire application is aborted. 
+.RE
+.PP
+
+.SS "void PI_Broadcast (\fBPI_BUNDLE\fP * b, const char * format,  ...)"
+.PP
+Writes to all channels in the specified bundle.
+.PP
+Simultaneously writes the format string and values to every channel contained in the bundle.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIb\fP Broadcaster bundle to write to. 
+.br
+\fIformat\fP Format string and values to write to the bundle. 
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+Bundle must be a broadcaster bundle. 
+.RE
+.PP
+
+.SS "int PI_ChannelHasData (\fBPI_CHANNEL\fP * c)"
+.PP
+Indicates whether the specified channel can be read.
+.PP
+Can be used to test whether or not a read operation would block. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIc\fP Channel to test for a queued read. 
+.RE
+.PP
+\fBReturn values:\fP
+.RS 4
+\fI1\fP if Channel has a queued read. 
+.br
+\fI0\fP if Channel does not have a queued read. 
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+Channel \fCc\fP has been created. 
+.RE
+.PP
+
+.SS "int PI_Configure (int * argc, char *** argv)"
+.PP
+Initializes the Pilot library.
+.PP
+Must be called before any other Pilot calls, passing argc,argv from main(). This function removes Pilot arguments from argc/argv, and the MPI implementation may do likewise for its own arguments. Therefore, \fBPI_Configure()\fP can be called before the application looks for its own arguments.
+.PP
+Optional command line arguments (all start with '-pi'):
+.PP
+.IP "\(bu" 2
+-picheck=<level number>
+.IP "  \(bu" 4
+0: minimum level (default)
+.IP "  \(bu" 4
+1: additional checks
+.IP "  \(bu" 4
+2: reserved for future use
+.PP
+
+.PP
+.PP
+.IP "\(bu" 2
+-pisvc=<runtime services>
+.IP "  \(bu" 4
+c: make log of API calls
+.IP "  \(bu" 4
+d: perform deadlock detection (uses one additional MPI process)
+.PP
+
+.PP
+.PP
+.IP "\(bu" 2
+-pilog=<filename>
+.PP
+.PP
+\fC-picheck\fP overrides any programmer setting of the PI_CheckLevel global variable made prior to calling \fC\fBPI_Configure()\fP\fP. Level N includes all levels below it.
+.PP
+\fC-pisvc\fP only causes relevant data to be dumped to the log file. Another program is needed to analyze and print/visualize the results. Other services are planned for future versions.
+.PP
+\fC-pilog\fP allows the name of the log file to be changed from the default 'pilot.log'
+.PP
+\fBNote:\fP
+.RS 4
+Only specifying -pilog=fname does not by itself create a log. Some logging service (presently only 'c') must also be selected.
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fIargc\fP Number of arguments, argument to main. 
+.br
+\fIargv\fP Array of strings, containing arguments.
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The number of MPI processes available for Pilot process creation. This number is a total that includes main (which is running and does not need to be explicitly created) and deadlock detection (if selected). If N is returned, then PI_CreateProcess can be called at most N-1 times.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+argc/argv are unmodified. 
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+MPI and Pilot are initialized. Pilot calls can be made. Pilot (and possibly MPI) arguments have been removed from argc/argv by shuffling up the argv array and decrementing argc.
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+Must be called in your program's main(). 
+.PP
+For special purposes like running benchmarks, Pilot can be put into 'bench mode' by calling MPI_Init prior to PI_Configure. 
+.RE
+.PP
+
+.SS "\fBPI_CHANNEL\fP** PI_CopyChannels (enum \fBPI_COPYDIR\fP direction, \fBPI_CHANNEL\fP *const  array[], int size)"
+.PP
+Copies an array of channels.
+.PP
+Given an array of channel pointers, this function duplicates the channels (i.e., for each CHANNEL* in the array, issues PI_CreateChannel on the same pair of endpoints) and returns their pointers in a same-size array. The order of channel pointers in the input and output arrays will be the same. If specified, the endpoints will be reversed (i.e., each channel from P to Q will be copied as a channel from Q to P). This function makes it convenient to create multiple channels between, say, a master process and a set of workers, where one set is for PI_Write usage, one set for PI_Broadcast, and another for PI_Select/Read or PI_Gather.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdirection\fP Symbol denoting the direction of the copy. PI_SAME will preserve the current endpoints; PI_REVERSE will flip the direction. 
+.br
+\fIarray\fP Channels to be copied. 
+.br
+\fIsize\fP Number of channels in array.
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns a pointer to the new array of CHANNEL*, same dimension as the size input.
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+'size' new channels were created, each having its default name.
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+This function does not copy a bundle. You can copy the array used to create a bundle, and then create a new bundle -- of same or different usage -- from the function's output. 
+.PP
+The main program should call free() on the returned array, since it is obtained via malloc. 
+.RE
+.PP
+
+.SS "\fBPI_BUNDLE\fP* PI_CreateBundle (enum \fBPI_BUNUSE\fP usage, \fBPI_CHANNEL\fP *const  array[], int size)"
+.PP
+Creates a channel grouping (bundle) for a particular collective use.
+.PP
+Creates a bundle of channels, such that all the channels must have one endpoint in common. Its default name will be 'Bn@Pc' where n is its integer bundle ID, and e is the process ID of the common endpoint. Returns a bundle pointer.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIusage\fP Symbol denoting how the bundle will be used. If PI_Broadcast will be called, then code PI_BROADCAST. 
+.br
+\fIarray\fP Channels to store in selector. 
+.br
+\fIsize\fP Number of channels in array.
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns the newly created bundle.
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+All channels in array are marked as being in this bundle.
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+The non-common end of all channels must be unique. 
+.PP
+A channel can be in only one bundle. 
+.RE
+.PP
+
+.SS "\fBPI_CHANNEL\fP* PI_CreateChannel (\fBPI_PROCESS\fP * from, \fBPI_PROCESS\fP * to)"
+.PP
+Creates a new channel between the specified processes.
+.PP
+Opens a channel between the specified processes, with the specified alias. Returns a channel pointer. Its default name will be 'Cn:Pf>Pt' where n is its integer channel ID, and f and t are the from/to process IDs, respectively. Multiple channels can exist between the same processes.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfrom\fP A pointer to the 'write-end' of the channel. 
+.br
+\fIto\fP A pointer to the 'read-end' of the channel.
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A pointer to the newly created channel, or NULL if an error occured.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+None 
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+Channel created, entered into channel table.
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+If PI_MAIN/NULL is specified for either process, it represents the master/main process (rank 0). 
+.RE
+.PP
+
+.SS "\fBPI_PROCESS\fP* PI_CreateProcess (\fBPI_WORK_FUNC\fP f, int index, void * opt_pointer)"
+.PP
+Creates a new process.
+.PP
+Assigns a function pointer as behavior to the new process, and returns a process pointer. Its default name will be 'Pn' where n is its integer process ID.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIf\fP Pointer to the function this process 'runs'. 
+.br
+\fIindex\fP An integer used for configuring the work function. 
+.br
+\fIopt_pointer\fP A pointer which can be used to supply data to the work function.
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A pointer to the process created, or NULL if an error occured.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+\fBPI_Configure()\fP has been called. 
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+Process has been created, stored in process table. 
+.RE
+.PP
+
+.SS "double PI_EndTime (void)"
+.PP
+Gives the time elapsed since the previous fixed point.
+.PP
+\fBReturns:\fP
+.RS 4
+The wall-clock time elapsed in seconds sinced \fBPI_StartTime()\fP was called. 
+.RE
+.PP
+
+.SS "void PI_Gather (\fBPI_BUNDLE\fP * b, const char * format,  ...)"
+.PP
+Read from all channels in the specified bundle.
+.PP
+Simultaneously reads the format string and values from every channel contained in the bundle.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIb\fP Broadcaster bundle to read from. 
+.br
+\fIformat\fP Format string and values to write to the bundle. 
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+Bundle must be a gatherer bundle. 
+.RE
+.PP
+
+.SS "\fBPI_CHANNEL\fP* PI_GetBundleChannel (const \fBPI_BUNDLE\fP * b, int index)"
+.PP
+Returns the specified channel from a bundle.
+.PP
+Given an index, returns that channel from the bundle.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIb\fP Bundle containing the desired channel. 
+.br
+\fIindex\fP index of the channel to return. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Requested channel, or NULL if index was invalid.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+Bundle \fCb\fP has been created. 
+.RE
+.PP
+
+.SS "int PI_GetBundleSize (const \fBPI_BUNDLE\fP * b)"
+.PP
+Returns the size of a bundle.
+.PP
+Provides the number of channels in the specified bundle.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIb\fP Bundle to return the size for. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Number of channels in this bundle.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+Bundle \fCb\fP has been created. 
+.RE
+.PP
+
+.SS "const char* PI_GetName (const void * object)"
+.PP
+Returns the friendly name of a process, channel, or bundle.
+.PP
+Returns a string containing the friendly name of the given object, or that of the caller's process if given NULL. This is the name set by the last call to \fBPI_SetName()\fP, or its default name if none was ever set.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIobject\fP The PROCESS*, CHANNEL*, or BUNDLE* whose name is to be returned, or NULL to indicate the caller's process. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+String containing the name of the given object (will not be NULL). 
+.RE
+.PP
+
+.SS "int PI_IsLogging (void)"
+.PP
+Returns true if logging to a file is enabled. 
+.SS "void PI_Log (const char * text)"
+.PP
+Logs a time-stamped event to the log file.
+.PP
+Allow a user program to make entries in the log file. If logging to file is not enabled, the call is a no-op. The user may wish to check \fBPI_IsLogging()\fP first. Each entry will record a time stamp and caller's process number. 
+.SS "void PI_Read (\fBPI_CHANNEL\fP * c, const char * format,  ...)"
+.PP
+Reads a number of values from the specified channel.
+.PP
+The format string specifies the types of each variable (see PI_Write).
+.PP
+\fBParameters:\fP
+.RS 4
+\fIc\fP Channel to read from. 
+.br
+\fIformat\fP Format string specifying the type of each variable.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+Channel must be open, should contain variables to read. 
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+Channel no longer contains variables read from it.
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+Variables after the format string must be given by reference (&arg), not by value, just as with scanf. 
+.PP
+Format strings on read/write ends must match! 
+.RE
+.PP
+
+.SS "int PI_Select (\fBPI_BUNDLE\fP * b)"
+.PP
+Returns the index of a channel in the bundle that has data to read.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIb\fP Bundle to select from. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Index of Channel to be read.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+Bundle has been created. 
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+The channel selected is the next to be read from those in the bundle.
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBPI_GetBundleChannel\fP 
+.RE
+.PP
+
+.SS "void PI_SetName (void * object, const char * name)"
+.PP
+Set the friendly name of a process, channel, or bundle.
+.PP
+When created, each object has a default name. If the user wishes to change them, say for log or error message readability, this function is used.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIobject\fP The PROCESS*, CHANNEL*, or BUNDLE* whose name is to be set. 
+.br
+\fIname\fP Friendly name for object. A copy is made of this string up to PI_MAX_NAMELEN characters. If NULL is supplied, the name is set to ''. 
+.RE
+.PP
+
+.SS "int PI_StartAll (void)"
+.PP
+Kicks off parallel processing.
+.PP
+All processes call their assigned functions, and the primary process continues as main. Other processes DO NOT RETURN from PI_StartAll (unless in 'bench mode', see below).
+.PP
+\fBReturns:\fP
+.RS 4
+MPI rank of this process. Normally this is of no interest because only the main process (rank 0) returns. But if Pilot has been put into 'bench mode' by calling MPI_Init in advance, then all processes will return. In that case, the user will want to check this value.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+PI_Configure must have been called. 
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+Parallel execution has begun.
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+No channels, processes, bundles or selectors may be created once this has been called. 
+.RE
+.PP
+
+.SS "void PI_StartTime (void)"
+.PP
+Starts an internal timer. Creates a fixed point in time -- the time between now and another point in time is reported by \fBPI_EndTime()\fP. 
+.SS "void PI_StopMain (int status)"
+.PP
+Performs clean up for the Pilot library.
+.PP
+Finalizes the underlying MPI library, de-allocates all internal structures.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstatus\fP If logging, value will appear in log, otherwise has no effect.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+PI_StartAll was called. 
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+No additional Pilot calls may be made after function returns.
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+Should be called only once, at the end of your program's main().
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+PI_StopMain_ is also called internally by PI_StartAll when each work function returns, in which case it calls exit(). 
+.PP
+Need to say something about 'bench mode.' 
+.RE
+.PP
+
+.SS "int PI_TrySelect (\fBPI_BUNDLE\fP * b)"
+.PP
+Indicates whether any of the Selector's channels can be read.
+.PP
+Same as PI_Select, except that if none of the Selector's channels is ready to be read (i.e., PI_ChannelHasData would return 0 for every channel), this function returns -1.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIb\fP Selector bundle to test for a queued read. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Index of Channel to be read, or -1 if no channel has data.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+Selector \fCb\fP has been created. 
+.RE
+.PP
+
+.SS "void PI_Write (\fBPI_CHANNEL\fP * c, const char * format,  ...)"
+.PP
+Writes a number of values to the specified channel.
+.PP
+The format string specifies the types of each variable. Uses control codes similar to stdio.h's scanf:
+.IP "\(bu" 2
+d or i - for integer
+.IP "\(bu" 2
+ld or li - for long int
+.IP "\(bu" 2
+lld or lli - for long long int
+.IP "\(bu" 2
+u - for unsigned int
+.IP "\(bu" 2
+lu - for unsigned long
+.IP "\(bu" 2
+llu - for unsigned long long
+.IP "\(bu" 2
+hd or hi - for short
+.IP "\(bu" 2
+hu - for unsigned short
+.IP "\(bu" 2
+c - for character (printable, may get code-converted)
+.IP "\(bu" 2
+hhu - for unsigned character
+.IP "\(bu" 2
+b - for byte (uninterpreted 8 bits, i.e., unsigned char)
+.IP "\(bu" 2
+f - for float
+.IP "\(bu" 2
+lf - for double
+.IP "\(bu" 2
+Lf - for long double Arrays are specified by inserting the size between % and the type, e.g., 25d = int[25]. If the size is specified as '*', it is obtained from the next argument, e.g., ('%*d', 25, intarray).
+.PP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIc\fP Channel to write to. 
+.br
+\fIformat\fP Format string specifying the type of each variable.
+.RE
+.PP
+\fBPrecondition:\fP
+.RS 4
+Channel must be open. 
+.RE
+.PP
+\fBPostcondition:\fP
+.RS 4
+Channel now contains the variables written to it.
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+1 (one) is not allowed since it looks too similar to l (ell). 
+.PP
+Variables after the format string are passed by value, except for arrays, following C's normal argument-passing practice. 
+.PP
+Format strings on read/write ends must match! 
+.RE
+.PP
+
+.SH "Variable Documentation"
+.PP 
+.SS "const char* \fBPI_CallerFile\fP"
+.PP
+Filename of current library caller. 
+.SS "int \fBPI_CallerLine\fP"
+.PP
+Line number of current library caller. 
+.SS "int \fBPI_CheckLevel\fP"
+.PP
+Specifies level of error checking to be done by library functions. The variable may be set directly by the programmer before calling PI_Configure, or indirectly by means of command line options (future). Normal value is 0, causing default error checking to be done. If set to N, additional checks up to and including level N will be done at the expense of performance degradation.
+.PP
+Level 0:
+.IP "\(bu" 2
+validates many function preconditions (detects user errors)
+.PP
+.PP
+Level 1:
+.IP "\(bu" 2
+validates internal tables (detects system errors, could be user-caused)
+.IP "\(bu" 2
+more time-consuming checks (read/write formats match arg list)
+.IP "\(bu" 2
+(future) check all returns from MPI function calls (default behaviour gives no info on location of failed call within library or which func user called); MPI errors would likely be Pilot system errors
+.PP
+.PP
+Level 2: (future)
+.IP "\(bu" 2
+check that read args are likely pointers (&arg) not data (arg)
+.IP "\(bu" 2
+send/check headers with every write/read to verify that no. and types of data match (adds message traffic up to double) 
+.PP
+
+.SS "int \fBPI_Errno\fP"
+.PP
+The last error encountered by the library.
+.PP
+If PI_OnErrorReturn is non-zero and an error was detected by a library function, then after the function returns, an error code > 0 (from pilate_error.h) will be here, and further calls to library functions will be undefined. If no error occurred, this variable will be zero (=PI_NO_ERROR). 
+.SS "int \fBPI_OnErrorReturn\fP"
+.PP
+Specifies whether or not an error detected by a library function should abort the program. The variable must be set directly by the programmer, and should only be used by Pilot developers in order to test error-checking mechanisms. It is not for use by Pilot application programmers. Normal value is 0, causing any error to abort the program via MPI_Abort. If set to non-zero, library functions will return after setting PI_Errno. 
+.SS "int \fBPI_QuietMode\fP"
+.PP
+Specifies whether Pilot will print a banner and configuration info on stdout when it starts up.
+.IP "\(bu" 2
+0 = normal print
+.IP "\(bu" 2
+non-0 = quiet Error messages will print on stderr regardless. 
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Pilot from the source code.

@@ -1,0 +1,185 @@
+===========================
+README for Pilot Unit Tests
+===========================
+:date: 27 July 2009
+
+
+Building the Unit Tests
+=======================
+In order to build the unit tests, first you need to make sure that you have
+CUnit version 2.1 or higher installed. It is possible that older versions
+will work, but Pilot has not been tested with them.
+
+If your CUnit is installed to a non-standard location, you will have to
+change the variable CUNITHOME in the file "tests/Makefile" to point to
+CUnit's location.
+
+To build the unit tests just run::
+
+    $ make
+
+in the "tests" directory.
+
+Besides the main unit tests there are a series of tests for the deadlock
+detector. To build these tests, just run::
+
+    $ make dl
+
+Note that the these tests require that you can use "mpirun" directly.
+
+
+Running the Unit Tests
+======================
+Running the unit tests is a good way to sanity check the build that you just
+made. In the "tests" directory there is a script called "run.sh". Depending
+on your MPI setup, you may be able to run this script without modification.
+If however, you are a SHARCNET user, you can run the following command::
+
+    $ sqrun --test -q mpi -r 2 -n 8 -o unittests.log ./test_suite
+
+*Note that the unit tests expect at least 8 processes to be available.*
+
+If you want to pass additional parameters to the ``test_suite``, you will have
+to edit ``default_argv`` and ``_argc`` in "unittests_main.c". Beware that if you
+decide to enable deadlock detection, some unit tests may not function as
+expected.
+
+If your CUnit install is not in a standard location, you may need to set the
+LD_LIBRARY_PATH environment variable so that the unit tests can access the
+libcunit.so file. For bash, this can be done as follows::
+
+    $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/your/cunit/lib
+
+To run the tests for the deadlock detector you can run::
+
+   $ deadlock_tests.sh
+
+*Note*: the deadlock tests require that you have the ability to invoke "mpirun"
+directly. Due to the inherent nature of multiprocessing, while these tests
+always deadlock, different execution orders will result in different diagnoses
+from Pilot. These are described in the file headers, and test-running scripts
+account for them. We need the ability to determine an execution order by
+reading from a file, in order to force precise deadlock scenarios to be
+detected (future work).
+
+
+Test Implementation
+===================
+Each MPI process creates a CUnit registry and adds all CUnit suites to its
+registry. The tests are run on all processes, but only the tests on the master
+process display output. Running CUnit on non-master processes is done so that
+each process can be properly initialized for a given test suite via its "init"
+function.
+
+See the `CUnit documentation`_ for information on how CUnit works.
+
+.. _CUnit documentation: http://cunit.sourceforge.net/doc/index.html
+
+What is a test case?
+--------------------
+A *test* or *test case* is a function that verifies a specific expected
+behaviour. The expected behaviour is checked with assert statements
+(specifically one of the CU_ASSERT macros).
+
+A single test may have multiple assert statements, but should test only one
+logical condition.
+
+What is a suite?
+----------------
+A *suite* or *test suite* is a set of test cases. Each suite must allocate all
+Pilot processes and channels to be used in all test cases that belong to the
+suite.
+
+Each suite can be thought of as a complete Pilot program.
+
+A typical Pilot program has 4 phases. The pre-init phase happens between the
+start of ``main()`` and the call to ``PI_Configure()``. The initialization phase
+occurs between ``PI_Configure()`` and ``PI_StartAll()``. Between
+``PI_StartAll()`` and ``PI_StopMain()`` is known as the running phase. The final
+post-run phase is everything after the call to ``PI_StopMain()``.
+
+In most programs, the transition between phases happens directly in ``main()``
+through a call to one of the pilot functions mentioned in the previous
+paragraph. For the purposes of testing however, these transitions have been
+split up into 3 separate functions. These 3 functions are present in every
+"suite".
+
+1. ``init()`` - Runs the pre-init and init phases, then starts the running
+   phase. This function is called before any of the suite's unit tests are run.
+2. A function which creates a new CUnit test suite and registers unit tests for
+   running. The tests are not run immediately.
+3. ``cleanup()`` - Calls ``PI_StopMain()`` if called on the Master node,
+   otherwise does nothing. Since Pilot is running in "bench mode" during the
+   unit tests, an explicit check must be made to ensure that ``PI_StopMain()``
+   is not called in a non-master processes.
+
+
+How to Create a New Test Suite
+==============================
+1. ``cp unittest_template.c your_new_suite.c``
+2. Edit *your_new_suite.c* to make it setup and run your tests
+3. Add the suite registration function to *unittests.h*
+4. If your suite uses more than NUM_REQUIRED_PROCS processes, increase this
+   value in unittests.h to match the number that your new suite requires.
+5. Add the suite registration function to the list of functions in *unittests_main.c*
+6. Edit the Makefile so that the ``test_suite`` rule depends on *your_new_suite.o*
+7. Run ``make`` and then run the unit tests
+
+Note that tests that are intended to fail must set PI_OnErrorReturn to non-0,
+and then zero PI_Errno before each PI_ function call. All calls will then
+return (rather than abort), and the error code will be found in PI_Errno.
+
+List of Tests
+=============
+1)  Initialization tests
+    a) PI_Configure returns the number of processors
+
+2)  Single Values
+    a) single int send and echo
+    b) single char send and echo
+    c) single float send and echo
+    d) single double send and echo
+    e) single MPI datatype send and echo
+
+3)  Array Values
+    a) 20 ints send and echo
+    b) 20 chars send and echo
+    c) 20 floats send and echo
+    d) 20 doubles send and echo
+    e) 20 MPI datatypes send and echo
+
+4)  Mixed Values
+    a) Mixed Single Values send and echo
+    b) Mixed Array Values send echo
+    c) Mixed Array and Singles
+
+5)  Selectors
+    a) Create a Selector with N procs, Select N times, making sure all channels.
+
+6)  Broadcaster
+    a) Send a value to N procs, have N procs echo back to main.
+
+7)  Gather
+    a) Receive a value from N procs.
+    b) Receive large array (> 10000 integers).
+    c) Receive from a non-main process.
+
+8)  Extra Read/Write Tests
+    a) Ensure attempting to PI_Write to a non-selector bundle fails.
+    b) Ensure attempting to PI_Read from a non-selector bundle fails.
+
+9)  Format Parsing
+    a) Parsing should fail on white-space only input.
+    b) Should fail when specified array size is invalid.
+    c) Should fail to parse "%lol%%byob".
+    d) Should fail on incomplete conversion specifier.
+    e) Should fail on NULL format string.
+    f) Should accept all format codes.
+    g) Should not crash if the specified format string greater than PI_MAX_FORMATLEN.
+
+
+Additional Needed Test Cases
+============================
+Tests still need to be written to trigger many PI_ASSERTs to fail. These tests
+should make sure that PI_OnErrorReturn != 0 and then use CU_ASSERT_EQUAL on
+PI_Errno after calling the Pilot function under test.

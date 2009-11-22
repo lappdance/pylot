@@ -1,0 +1,6 @@
+--one-line=keep-blocks
+--one-line=keep-statements
+--pad=oper
+--pad=paren-in
+--unpad=paren
+--brackets=linux

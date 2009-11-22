@@ -1,0 +1,36 @@
+=======================
+RELEASE_NOTES for Pilot
+=======================
+:date: 22 September 2009
+:version: Version 1.1
+
+* V1.1 provides formats for all C/MPI data types::
+
+  %c	char		MPI_CHAR
+  %hhu	unsigned char	MPI_UNSIGNED_CHAR
+  %d, %i int		MPI_INT
+  %hd	short int	MPI_SHORT
+  %ld	long int	MPI_LONG
+  %lld	long long int	MPI_LONG_LONG
+  %u	unsigned int	MPI_UNSIGNED
+  %f	float		MPI_FLOAT
+  %lf	double		MPI_DOUBLE
+  %Lf	long double	MPI_LONG_DOUBLE
+  %b	any		MPI_BYTE
+  %m	user-defined	MPI_Datatype variable
+
+  u gives corresponding unsigned integer types: hu, lu, llu
+
+* To utilize the new %m format, one must call the relevant MPI functions directly to construct the custom type in a variable of type MPI_Datatype. The variable is then passed as an extra argument to PI_Read, PI_Write, etc. That is, %m consumes the next two arguments in the list (or three if ``*`` is coded). For example: ``PI_Write( "%*m", len, mytype, buff );`` where len is the number of mytype elements in the buff array.
+
+* A format length of literal one (1) is no longer allowed to avoid (a) confusing %1f (array of one float) with %lf (scalar double), and (b) confusing scalar float with array of one float (which require different arguments to PI_Write, ``float`` vs. ``float*``). An array of one type T can always be specified using ``%*T``.
+
+* Error detection has been greatly strengthened for format strings.
+
+* Deadlock detection is more accurate (certain event sequences involving PI_Select could be diagnosed as deadlocked when they were actually valid).
+
+* Deadlock tests script deadlock_tests.sh allows for multiple deadlock diagnoses to account for any order of execution.
+
+* More regression tests have been created.
+
+* Source files have been cleaned up with consistent use of doxygen tags.

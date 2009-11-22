@@ -1,0 +1,65 @@
+.TH "pilot_limits.h" 3 "10 Oct 2009" "Pilot" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+pilot_limits.h \- Public header file for compiled-in limits.  
+
+.PP
+.SH SYNOPSIS
+.br
+.PP
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBPI_MAX_NAMELEN\fP   100"
+.br
+.RI "\fIThe maximum length for string identifiers. \fP"
+.ti -1c
+.RI "#define \fBPI_MAX_FORMATLEN\fP   50"
+.br
+.RI "\fIMaximum number of format codes allowed in a single/readwrite. \fP"
+.ti -1c
+.RI "#define \fBPI_MAX_BUNDLES\fP   20"
+.br
+.RI "\fIMaximum number of bundles that may exist. \fP"
+.ti -1c
+.RI "#define \fBPI_END1\fP   954855748"
+.br
+.ti -1c
+.RI "#define \fBPI_END2\fP   580460701"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Public header file for compiled-in limits. 
+
+\fBAuthor:\fP
+.RS 4
+W. Gardner
+.RE
+.PP
+Your version of Pilot was compiled with these parameters. They are exposed here in case you trigger an error for exceeding one. Changing anything here without recompiling the library will not be effective. 
+.SH "Define Documentation"
+.PP 
+.SS "#define PI_END1   954855748"
+.PP
+.SS "#define PI_END2   580460701"
+.PP
+.SS "#define PI_MAX_BUNDLES   20"
+.PP
+Maximum number of bundles that may exist. 
+.PP
+.SS "#define PI_MAX_FORMATLEN   50"
+.PP
+Maximum number of format codes allowed in a single/readwrite. 
+.PP
+Used for Read/Write calls. 
+.SS "#define PI_MAX_NAMELEN   100"
+.PP
+The maximum length for string identifiers. 
+.PP
+The length of strings used to identify processes, channels, and bundles. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Pilot from the source code.
