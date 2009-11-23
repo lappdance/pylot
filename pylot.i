@@ -81,17 +81,18 @@
 }
 
 %rename(PI_Configure_) wrap_PI_Configure;
-%rename(PI_Write_) PI_WriteInt;
-%rename(PI_Write_) PI_WriteIntArray;
-%rename(PI_Write_) PI_WriteDouble;
-%rename(PI_Write_) PI_WriteDoubleArray;
-%rename(PI_Write_) PI_WriteString;
+%rename(PI_Write_) PI_WriteVarArgs;
 %rename(PI_Read_) PI_ReadItem;
 %rename(PI_Read_) PI_ReadArray;
+%rename(PI_Broadcast_) PI_BroadcastVarArgs;
+%rename(PI_Gather_) PI_GatherItem;
+%rename(PI_Gather_) PI_GatherArray;
 
 %ignore PI_Configure_;
 %ignore PI_Read_;
 %ignore PI_Write_;
+%ignore PI_Broadcast_;
+%ignore PI_Gather_;
 
 %{
 #include "pilot.h"

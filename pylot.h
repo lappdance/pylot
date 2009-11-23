@@ -21,23 +21,22 @@
 int wrap_PI_Configure(char** argv);
 
 /**
- Write a single int to a channel.
+ Write items to a channel. This method does not yet support extracting items from
+ lists or tuples, so each arg must be given as a seperate object.
+ Thus,
+ @code
+ 	pylot.write(channel, arg0, arg1, arg2)
+ @endcode
+ and not
+ @code
+ 	l = [arg0, arg1, arg2]
+ 	pylot.write(l)
+ @endcode
+ .
  @param [in] c The channel to write to.
- @param [in] i The int
+ @param [in] varargs A sequence of Python objects.
 **/
-void PI_WriteInt(PI_CHANNEL* c, int i);
-/**
- Write an array of ints to a channel.
- @param [in] array The array to write.
- @param [in] n The length of the array
-**/
-void PI_WriteIntArray(PI_CHANNEL* c, int* array, int n);
-/** @overload */
-void PI_WriteDouble(PI_CHANNEL* c, double d);
-/** @overload */
-void PI_WriteDoubleArray(PI_CHANNEL* c, double* array, int n);
-/** Write a null-terminated string to a channel. */
-void PI_WriteString(PI_CHANNEL* c, char* text);
+void PI_WriteVarArgs(PI_CHANNEL* c, PyObject* varargs);
 
 /**
  Read one Python object from a channel.
@@ -53,6 +52,8 @@ PyObject* PI_ReadItem(PI_CHANNEL* c);
  @return A list of ints, doubles, or strings.
 **/
 PyObject* PI_ReadArray(PI_CHANNEL* c, int n);
+
+void PI_BroadcastVarArgs(PI_BUNDLE* bundle, PyObject* varargs);
 
 #endif //PYLOT_INCLUDE_PYLOT_H
 

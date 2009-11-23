@@ -8,7 +8,7 @@ OBJECTS = ${addsuffix .o, \
 }
 
 CC := mpicc
-CFLAGS := -g -fPIC -O2 -c -I/usr/include/python2.6
+CFLAGS := -Wall -g -fPIC -O2 -c -I/usr/include/python2.6
 LDFLAGS := -shared
 
 all : $(TARGET)
@@ -19,6 +19,6 @@ clean :
 $(TARGET) : $(OBJECTS)
 	$(CC) $(LDFLAGS) -o$@ $^
 
-pylot_wrap.c pylot\pylot.py : pylot.i
-	swig -python -I./pilot-1.1 -outdir pylot $^
+pylot_wrap.c pylot\pylot.py : pylot.i pylot.h
+	swig -python -I./pilot-1.1 -outdir pylot $<
 
