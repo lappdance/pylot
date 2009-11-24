@@ -1,5 +1,5 @@
 import ctypes
-_libmpi = ctypes.cdll.LoadLibrary("libmpi.so")
+_libmpi = ctypes.CDLL("libmpi.so", ctypes.RTLD_GLOBAL)
 
 import pylot
 

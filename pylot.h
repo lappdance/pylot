@@ -20,6 +20,8 @@
 **/
 int wrap_PI_Configure(char** argv);
 
+PI_PROCESS* wrap_PI_CreateProcess(PyObject* function, int index, PyObject* data);
+
 /**
  Write items to a channel. This method does not yet support extracting items from
  lists or tuples, so each arg must be given as a seperate object.
@@ -53,7 +55,7 @@ PyObject* PI_ReadItem(PI_CHANNEL* c);
 **/
 PyObject* PI_ReadArray(PI_CHANNEL* c, int n);
 
-void PI_BroadcastVarArgs(PI_BUNDLE* bundle, PyObject* varargs);
+//void PI_BroadcastVarArgs(PI_BUNDLE* bundle, PyObject* varargs);
 
 #endif //PYLOT_INCLUDE_PYLOT_H
 

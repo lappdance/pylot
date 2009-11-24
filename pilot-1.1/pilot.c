@@ -287,7 +287,8 @@ int PI_Configure_( int *argc, char ***argv )
 			"Pilot Online Process" );
     }
 
-    return i;	/* no. of processes available to user, including PI_MAIN */
+	return thisproc.rank;
+//    return i;	/* no. of processes available to user, including PI_MAIN */
 }
 
 /* Note: Process IDs (=MPI rank) run from 0 */

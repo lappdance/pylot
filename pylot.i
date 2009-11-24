@@ -24,10 +24,6 @@
   }
 }
 
-%typemap(freearg) (char** argv) {
-	free($1);
-}
-
 %typemap(in) (int* array, int n) {
 	/* Check if is a list */
   if (PyList_Check($input)) {
@@ -72,6 +68,10 @@
   }
 }
 
+%typemap(freearg) (char** argv) {
+	free($1);
+}
+
 %typemap(freearg) (double* array, int n) {
 	free($1);
 }
@@ -80,19 +80,26 @@
 	free($1);
 }
 
+%typemap(check) (PyObject* function) {
+	if(!PyCallable_Check($1))
+		SWIG_exception_fail(SWIG_ValueError, "callback function must be a functor");
+}
+
 %rename(PI_Configure_) wrap_PI_Configure;
 %rename(PI_Write_) PI_WriteVarArgs;
 %rename(PI_Read_) PI_ReadItem;
 %rename(PI_Read_) PI_ReadArray;
-%rename(PI_Broadcast_) PI_BroadcastVarArgs;
-%rename(PI_Gather_) PI_GatherItem;
-%rename(PI_Gather_) PI_GatherArray;
+#%rename(PI_Broadcast_) PI_BroadcastVarArgs;
+#%rename(PI_Gather_) PI_GatherItem;
+#%rename(PI_Gather_) PI_GatherArray;
+%rename(PI_CreateProcess_) wrap_PI_CreateProcess;
 
 %ignore PI_Configure_;
 %ignore PI_Read_;
 %ignore PI_Write_;
-%ignore PI_Broadcast_;
-%ignore PI_Gather_;
+#%ignore PI_Broadcast_;
+#%ignore PI_Gather_;
+%ignore PI_CreateProcess_;
 
 %{
 #include "pilot.h"
