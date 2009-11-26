@@ -12,6 +12,8 @@
 #include<Python.h>
 #include<pilot.h>
 
+typedef int bool_type;
+
 /**
  Wrapper func for PI_Configure. @c argv is not modified.
  @param [in] argv Command-line arguments. This array is a copy of @c sys.argv,
@@ -20,6 +22,17 @@
 **/
 int wrap_PI_Configure(char** argv);
 
+/**
+ Wrapper func to allow Python objects to be used as callbacks. SWIG won't do this
+ for me automatically.
+ @param [in] function Function callback. This object must be callable, and have
+             a signature that matches @code def foo(index, data) @endcode.
+ @param [in] index The index of the process. This value is passed to the process
+             when it is spawned.
+ @param [in] data User data. Anything is valid.
+ @return A handle to the process. The process will not start until @c PI_StartAll
+         is called.
+**/
 PI_PROCESS* wrap_PI_CreateProcess(PyObject* function, int index, PyObject* data);
 
 /**
@@ -37,8 +50,9 @@ PI_PROCESS* wrap_PI_CreateProcess(PyObject* function, int index, PyObject* data)
  .
  @param [in] c The channel to write to.
  @param [in] varargs A sequence of Python objects.
+ @return @c true if the write was successful, @c false if it was not
 **/
-void PI_WriteVarArgs(PI_CHANNEL* c, PyObject* varargs);
+bool_type PI_WriteVarArgs(PI_CHANNEL* c, PyObject* varargs);
 
 /**
  Read one Python object from a channel.

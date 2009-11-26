@@ -80,7 +80,7 @@ enum type typeForObject(PyObject* o) {
 		return UNKNOWN;
 }
 
-void writeArg(PI_CHANNEL* channel, PyObject* arg) {	
+bool_type writeArg(PI_CHANNEL* channel, PyObject* arg) {	
 	enum type type = typeForObject(arg);
 	
 	switch(type) {
@@ -102,28 +102,37 @@ void writeArg(PI_CHANNEL* channel, PyObject* arg) {
 			} break;
 		case SEQUENCE:
 			PyErr_SetString(PyExc_TypeError, "you cannot write lists, dicts or tuples to a channel");
+			return 0;
 			break;
 		default:
 			PyErr_SetString(PyExc_TypeError, "unknown type in send list");
+			return 0;
 			break;
 	}
 
+	return 1;
 }
 
-void PI_WriteVarArgs(PI_CHANNEL* c, PyObject* args) {
+bool_type PI_WriteVarArgs(PI_CHANNEL* c, PyObject* args) {
+	assert(args && "args is null");
+	
 	int i = 0;
-	size_t numArgs = PyList_Size(args);
+	size_t numArgs = PyTuple_Size(args);
 	
 	/* @c args contains every python object provided after @c c. */
-	if(numArgs < 1) {
+	if(numArgs < 1 || (int)numArgs == -1) {
 		PyErr_SetString(PyExc_ValueError, "you must write at least one object");
+		return 0;
 	}
 	
 	for(i=0; i<numArgs; ++i) {
 		//should recurse if arg is a sequence?
-		writeArg(c, PyList_GetItem(args, i));
+		int success = writeArg(c, PyTuple_GetItem(args, i));
+		if(!success)
+			return 0;
 	}
 
+	return 1;
 }
 
 PyObject* PI_ReadItem(PI_CHANNEL* c) {

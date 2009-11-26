@@ -3,7 +3,7 @@ _libmpi = ctypes.CDLL("libmpi.so", ctypes.RTLD_GLOBAL)
 
 import pylot
 
-PI_MAIN = pylot.PI_MAIN
+PI_MAIN = pylot.mainProc
 process = pylot.PI_CreateProcess_
 channel = pylot.PI_CreateChannel_
 PI_BROADCAST = pylot.PI_BROADCAST

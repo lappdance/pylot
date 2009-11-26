@@ -24,65 +24,31 @@
   }
 }
 
-%typemap(in) (int* array, int n) {
-	/* Check if is a list */
-  if (PyList_Check($input)) {
-    $2 = PyList_Size($input);
-    int i = 0;
-    $1 = (int*) malloc(($2)*sizeof(int));
-    for (i = 0; i < $2; i++) {
-      PyObject *o = PyList_GetItem($input,i);
-      if (PyInt_Check(o))
-        $1[i] = PyInt_AsLong(PyList_GetItem($input,i));
-      else {
-        PyErr_SetString(PyExc_TypeError,"list must contain ints");
-        free($1);
-        return NULL;
-      }
-    }
-  } else {
-    PyErr_SetString(PyExc_TypeError,"not a list");
-    return NULL;
-  }
-}
-
-%typemap(in) (double* array, int n) {
-	/* Check if is a list */
-  if (PyList_Check($input)) {
-    $2 = PyList_Size($input);
-    int i = 0;
-    $1 = (double*) malloc(($2)*sizeof(double));
-    for (i = 0; i < $2; i++) {
-      PyObject *o = PyList_GetItem($input,i);
-      if (PyFloat_Check(o))
-        $1[i] = PyFloat_AsDouble(PyList_GetItem($input,i));
-      else {
-        PyErr_SetString(PyExc_TypeError,"list must contain floats");
-        free($1);
-        return NULL;
-      }
-    }
-  } else {
-    PyErr_SetString(PyExc_TypeError,"not a list");
-    return NULL;
-  }
-}
-
 %typemap(freearg) (char** argv) {
-	free($1);
-}
-
-%typemap(freearg) (double* array, int n) {
-	free($1);
-}
-
-%typemap(freearg) (int* array, int n) {
 	free($1);
 }
 
 %typemap(check) (PyObject* function) {
 	if(!PyCallable_Check($1))
 		SWIG_exception_fail(SWIG_ValueError, "callback function must be a functor");
+}
+
+%typemap(check) (PI_CHANNEL*) {
+	if(!$1)
+		SWIG_exception_fail(SWIG_ValueError, "channel cannot be null: did you forget to call it global?");
+}
+
+%typemap(in) (PyObject* varargs) {
+	assert(PySequence_Check(args));
+	$1 = PySequence_GetSlice(args, $argnum-1, PySequence_Length(args));
+}
+
+%typemap(freearg) (PyObject* varargs) {
+	Py_XDECREF($1);
+}
+
+%typemap(out) (bool_type) {
+	$result = $1 ? SWIG_Py_Void() : 0L;
 }
 
 %rename(PI_Configure_) wrap_PI_Configure;
@@ -101,6 +67,8 @@
 #%ignore PI_Gather_;
 %ignore PI_CreateProcess_;
 
+%ignore PI_MAIN;
+
 %{
 #include "pilot.h"
 #include "pylot.h"
@@ -108,4 +76,6 @@
 
 %include "pilot.h"
 %include "pylot.h"
+
+%constant PI_PROCESS* mainProc = 0L;
 
