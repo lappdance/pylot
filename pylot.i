@@ -38,36 +38,37 @@
 		SWIG_exception_fail(SWIG_ValueError, "channel cannot be null: did you forget to call it global?");
 }
 
-%typemap(in) (PyObject* varargs) {
-	assert(PySequence_Check(args));
-	$1 = PySequence_GetSlice(args, $argnum-1, PySequence_Length(args));
-}
-
-%typemap(freearg) (PyObject* varargs) {
-	Py_XDECREF($1);
-}
-
 %typemap(out) (bool_type) {
 	$result = $1 ? SWIG_Py_Void() : 0L;
+}
+
+//for some reason, SWIG won't break the varargs apart properly
+//it leaves the first arg in @c args instead of putting it in @c varargs
+//so i need to construct my own @c varargs variable
+%typemap(in) (...) {
+	PyObject* firstArg = PyTuple_Pack(1, PySequence_GetItem(args, $argnum-1));
+	$1 = PySequence_Concat(firstArg, varargs);
+}
+
+%typemap(freearg) (...) {
+	Py_XDECREF($1);
 }
 
 %rename(PI_Configure_) wrap_PI_Configure;
 %rename(PI_Write_) PI_WriteVarArgs;
 %rename(PI_Read_) PI_ReadItem;
 %rename(PI_Read_) PI_ReadArray;
-#%rename(PI_Broadcast_) PI_BroadcastVarArgs;
-#%rename(PI_Gather_) PI_GatherItem;
-#%rename(PI_Gather_) PI_GatherArray;
+//%rename(PI_Broadcast_) PI_BroadcastVarArgs;
+//%rename(PI_Gather_) PI_GatherItem;
+//%rename(PI_Gather_) PI_GatherArray;
 %rename(PI_CreateProcess_) wrap_PI_CreateProcess;
 
 %ignore PI_Configure_;
 %ignore PI_Read_;
 %ignore PI_Write_;
-#%ignore PI_Broadcast_;
-#%ignore PI_Gather_;
+//%ignore PI_Broadcast_;
+//%ignore PI_Gather_;
 %ignore PI_CreateProcess_;
-
-%ignore PI_MAIN;
 
 %{
 #include "pilot.h"

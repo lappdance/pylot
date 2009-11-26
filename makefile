@@ -19,6 +19,6 @@ clean :
 $(TARGET) : $(OBJECTS)
 	$(CC) $(LDFLAGS) -o$@ $^
 
-pylot_wrap.c pylot\pylot.py : pylot.i pylot.h
+pylot_wrap.c pylot/pylot.py : pylot.i pylot.h
 	swig -python -I./pilot-1.1 -outdir pylot $<
 

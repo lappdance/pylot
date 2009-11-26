@@ -1,4 +1,5 @@
 #include"pylot.h"
+#include<stdarg.h>
 
 int wrap_PI_Configure(char** argv) {
 	int i = 0;
@@ -201,3 +202,16 @@ abort:
 	Py_DECREF(list);
 	return 0L;
 }
+
+PyObject* echoargs(void* pv, ...) {
+	va_list list;
+	va_start(list, pv);
+	
+	PyObject* obj = va_arg(list, PyObject*);
+	Py_INCREF(obj);
+	
+	va_end(list);
+	
+	return obj;
+}
+

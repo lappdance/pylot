@@ -69,6 +69,8 @@ PyObject* PI_ReadItem(PI_CHANNEL* c);
 **/
 PyObject* PI_ReadArray(PI_CHANNEL* c, int n);
 
+PyObject* echoargs(void* pv, ...);
+
 //void PI_BroadcastVarArgs(PI_BUNDLE* bundle, PyObject* varargs);
 
 #endif //PYLOT_INCLUDE_PYLOT_H
