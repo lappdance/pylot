@@ -62,7 +62,8 @@ enum type {
 	INT = 'i',
 	FLOAT = 'd',
 	NONE = 'v',
-	SEQUENCE = 'l',
+	LIST = 'l',
+	TUPLE = 't',
 	UNKNOWN = '?'
 };
 
@@ -75,8 +76,10 @@ enum type typeForObject(PyObject* o) {
 		return INT;
 	else if(PyFloat_Check(o))
 		return FLOAT;
-	else if(PyList_Check(o) || PyTuple_Check(o))
-		return SEQUENCE;
+	else if(PyList_Check(o))
+		return LIST;
+	else if(PyTuple_Check(o))
+		return TUPLE;
 	else
 		return UNKNOWN;
 }
@@ -101,10 +104,19 @@ bool_type writeArg(PI_CHANNEL* channel, PyObject* arg) {
 			size_t length = strlen(string);
 			PI_Write(channel, "%c%lu%*c", type, length, length, string);
 			} break;
-		case SEQUENCE:
-			PyErr_SetString(PyExc_TypeError, "you cannot write lists, dicts or tuples to a channel");
-			return 0;
-			break;
+		case LIST:
+		case TUPLE: {
+			int i = 0;
+			size_t length = PySequence_Length(arg);
+			PI_Write(channel, "%c%lu", type, length);
+			
+			for(i=0; i<length; ++i) {
+				int success = writeArg(channel, PySequence_GetItem(arg, i));
+				if(!success)
+					return 0;
+			}
+			
+			} break;
 		default:
 			PyErr_SetString(PyExc_TypeError, "unknown type in send list");
 			return 0;
@@ -114,11 +126,17 @@ bool_type writeArg(PI_CHANNEL* channel, PyObject* arg) {
 	return 1;
 }
 
-bool_type PI_WriteVarArgs(PI_CHANNEL* c, PyObject* args) {
-	assert(args && "args is null");
-	
+bool_type PI_WriteVarArgs(PI_CHANNEL* c, ...) {
+	va_list list;
+	PyObject* args = 0L;
 	int i = 0;
-	size_t numArgs = PyTuple_Size(args);
+	size_t numArgs = 0;
+	
+	va_start(list, c);
+	args = va_arg(list, PyObject*);
+	va_end(list);
+	
+	numArgs = PyTuple_Size(args);
 	
 	/* @c args contains every python object provided after @c c. */
 	if(numArgs < 1 || (int)numArgs == -1) {
@@ -127,7 +145,6 @@ bool_type PI_WriteVarArgs(PI_CHANNEL* c, PyObject* args) {
 	}
 	
 	for(i=0; i<numArgs; ++i) {
-		//should recurse if arg is a sequence?
 		int success = writeArg(c, PyTuple_GetItem(args, i));
 		if(!success)
 			return 0;
@@ -170,6 +187,22 @@ PyObject* PI_ReadItem(PI_CHANNEL* c) {
 			Py_INCREF(Py_None);
 			obj = Py_None;
 			} break;
+		case LIST:
+		case TUPLE: {
+			size_t length = 0;
+			PI_Read(c, "%lu", &length);
+			
+			PyObject* list = PI_ReadArray(c, (int)length);
+			
+			if(type == LIST)
+				obj = list;
+			else {
+				PyObject* tuple = PyList_AsTuple(list);
+				Py_XDECREF(list);
+				obj = tuple;
+			}
+			
+			} break;
 		default:
 			PyErr_SetString(PyExc_TypeError, "unknown data type in channel");
 			break;
@@ -194,7 +227,6 @@ PyObject* PI_ReadArray(PI_CHANNEL* c, int n) {
 			goto abort;
 		
 		PyList_SetItem(list, i, item);
-		Py_DECREF(item);
 	}
 	
 	return list;

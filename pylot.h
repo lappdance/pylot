@@ -52,7 +52,7 @@ PI_PROCESS* wrap_PI_CreateProcess(PyObject* function, int index, PyObject* data)
  @param [in] varargs A sequence of Python objects.
  @return @c true if the write was successful, @c false if it was not
 **/
-bool_type PI_WriteVarArgs(PI_CHANNEL* c, PyObject* varargs);
+bool_type PI_WriteVarArgs(PI_CHANNEL* c, ...);
 
 /**
  Read one Python object from a channel.

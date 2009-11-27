@@ -78,5 +78,3 @@
 %include "pilot.h"
 %include "pylot.h"
 
-%constant PI_PROCESS* mainProc = 0L;
-

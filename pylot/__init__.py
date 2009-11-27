@@ -3,22 +3,24 @@ _libmpi = ctypes.CDLL("libmpi.so", ctypes.RTLD_GLOBAL)
 
 import pylot
 
-PI_MAIN = pylot.mainProc
-process = pylot.PI_CreateProcess_
-channel = pylot.PI_CreateChannel_
-PI_BROADCAST = pylot.PI_BROADCAST
-PI_GATHER = pylot.PI_GATHER
-PI_SELECT = pylot.PI_SELECT
-bundle = pylot.PI_CreateBundle_
-PI_SAME = pylot.PI_SAME
-PI_REVERSE = pylot.PI_REVERSE
+MAIN = None
+BROADCAST = pylot.PI_BROADCAST
+GATHER = pylot.PI_GATHER
+SELECT = pylot.PI_SELECT
+SAME = pylot.PI_SAME
+REVERSE = pylot.PI_REVERSE
+configure = pylot.PI_Configure_
+createProcess = pylot.PI_CreateProcess_
+createChannel = pylot.PI_CreateChannel_
+createBundle = pylot.PI_CreateBundle_
 copyChannels = pylot.PI_CopyChannels_
+getName = pylot.PI_GetName_
 setName = pylot.PI_SetName_
 startAll = pylot.PI_StartAll_
-getName = pylot.PI_GetName_
+stopMain = pylot.PI_StopMain_
 select = pylot.PI_Select_
-channelHasData = pylot.PI_ChannelHasData_
 trySelect = pylot.PI_TrySelect_
+channelHasData = pylot.PI_ChannelHasData_
 getBundleChannel = pylot.PI_GetBundleChannel_
 getBundleSize = pylot.PI_GetBundleSize_
 broadcast = pylot.PI_Broadcast_
@@ -28,8 +30,6 @@ endTime = pylot.PI_EndTime
 log = pylot.PI_Log_
 isLogging = pylot.PI_IsLogging
 abort = pylot.PI_Abort
-stopMain = pylot.PI_StopMain_
-configure = pylot.PI_Configure_
 
 write = pylot.PI_Write_
 read = pylot.PI_Read_
