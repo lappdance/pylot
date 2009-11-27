@@ -51,7 +51,7 @@
 }
 
 %typemap(freearg) (...) {
-	Py_XDECREF($1);
+	Py_XDECREF((PyObject*)$1);
 }
 
 %rename(PI_Configure_) wrap_PI_Configure;
