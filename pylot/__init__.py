@@ -2,6 +2,7 @@ import ctypes
 _libmpi = ctypes.CDLL("libmpi.so", ctypes.RTLD_GLOBAL)
 
 import pylot
+import sys
 
 MAIN = None
 BROADCAST = pylot.PI_BROADCAST
@@ -9,7 +10,15 @@ GATHER = pylot.PI_GATHER
 SELECT = pylot.PI_SELECT
 SAME = pylot.PI_SAME
 REVERSE = pylot.PI_REVERSE
-configure = pylot.PI_Configure_
+
+def enterBenchMode():
+	pylot.enterBenchMode(sys.argv)
+	
+exitBenchMode = pylot.exitBenchMode
+
+def configure():
+	pylot.PI_Configure_(sys.argv)
+
 createProcess = pylot.PI_CreateProcess_
 createChannel = pylot.PI_CreateChannel_
 createBundle = pylot.PI_CreateBundle_
@@ -23,15 +32,8 @@ trySelect = pylot.PI_TrySelect_
 channelHasData = pylot.PI_ChannelHasData_
 getBundleChannel = pylot.PI_GetBundleChannel_
 getBundleSize = pylot.PI_GetBundleSize_
-broadcast = pylot.PI_Broadcast_
-startTime = pylot.PI_StartTime
-endTime = pylot.PI_EndTime
-log = pylot.PI_Log_
-isLogging = pylot.PI_IsLogging
-abort = pylot.PI_Abort
 
-write = pylot.PI_Write_
-read = pylot.PI_Read_
+broadcast = pylot.PI_Broadcast_
 
 def gather(bundle, n=1):
 	if n < 1:
@@ -40,5 +42,14 @@ def gather(bundle, n=1):
 	if n == 1:
 		return pylot.PI_GatherItem(bundle);
 	else:
-		return zip(*[gather(bundle) for i in range(n)])
+		return [gather(bundle) for i in range(n)]
+
+startTime = pylot.PI_StartTime
+endTime = pylot.PI_EndTime
+log = pylot.PI_Log_
+isLogging = pylot.PI_IsLogging
+abort = pylot.PI_Abort
+
+write = pylot.PI_Write_
+read = pylot.PI_Read_
 

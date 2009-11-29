@@ -8,7 +8,7 @@ OBJECTS = ${addsuffix .o, \
 }
 
 CC := mpicc
-CFLAGS := -Wall -g -fPIC -c -I/usr/include/python2.5 -I./pilot-1.1
+CFLAGS := -Wall -g3 -fPIC -c -I/usr/include/python2.5 -I./pilot-1.1
 LDFLAGS := -shared
 
 all : $(TARGET)

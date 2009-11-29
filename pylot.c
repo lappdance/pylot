@@ -1,5 +1,18 @@
 #include"pylot.h"
 #include<stdarg.h>
+#include<mpi.h>
+
+void enterBenchMode(char** argv) {
+	int i = 0;
+	while(argv[i])
+		++i;
+	
+	MPI_Init(&i, &argv);
+}
+
+void exitBenchMode() {
+	MPI_Finalize();
+}
 
 int wrap_PI_Configure(char** argv) {
 	int i = 0;

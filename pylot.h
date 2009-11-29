@@ -15,6 +15,15 @@
 typedef int bool_type;
 
 /**
+ Put Pilot into "bench mode".
+ In bench mode, Pilot can be stopped and restarted without reinitializing the
+ entire program.
+**/
+void enterBenchMode(char** argv);
+/** Exit "bench mode" and return to normal behaviour. */
+void exitBenchMode();
+
+/**
  Wrapper func for PI_Configure. @c argv is not modified.
  @param [in] argv Command-line arguments. This array is a copy of @c sys.argv,
                   and so the original is not modified.
@@ -86,21 +95,6 @@ bool_type PI_BroadcastVarArgs(PI_BUNDLE* bundle, ...);
  @return A 1-D list.
 **/
 PyObject* PI_GatherItem(PI_BUNDLE* bundle);
-
-#if 0
-
-broadcast works the same way as write
-
-gather works like read: 2 overloads
-gather(channel) returns 1d list
-	type of incoming arg available from write, remember?
-	gather type
-	switch type
-	gather data
-
-gather(channel, n) return 2d list
-
-#endif //0
 
 #endif //PYLOT_INCLUDE_PYLOT_H
 
