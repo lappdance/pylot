@@ -71,7 +71,36 @@ PyObject* PI_ReadArray(PI_CHANNEL* c, int n);
 
 PyObject* echoargs(void* pv, ...);
 
-//void PI_BroadcastVarArgs(PI_BUNDLE* bundle, PyObject* varargs);
+/**
+ Broadcast arguments to multiple channels at once.
+ @param [in] bundle The bundle of channels to write to
+ @param [in] ... A sequence of objects to write
+**/
+bool_type PI_BroadcastVarArgs(PI_BUNDLE* bundle, ...);
+
+/**
+ Read from multiple channels at once.
+ At the moment, only numbers and @c None can be gathered this way; strings and
+ lists must be read individually from each channel.
+ @param [in] bundle The bundle to read from.
+ @return A 1-D list.
+**/
+PyObject* PI_GatherItem(PI_BUNDLE* bundle);
+
+#if 0
+
+broadcast works the same way as write
+
+gather works like read: 2 overloads
+gather(channel) returns 1d list
+	type of incoming arg available from write, remember?
+	gather type
+	switch type
+	gather data
+
+gather(channel, n) return 2d list
+
+#endif //0
 
 #endif //PYLOT_INCLUDE_PYLOT_H
 

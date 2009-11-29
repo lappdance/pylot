@@ -247,3 +247,123 @@ PyObject* echoargs(void* pv, ...) {
 	return obj;
 }
 
+bool_type broadcastArg(PI_BUNDLE* bundle, PyObject* arg) {	
+	enum type type = typeForObject(arg);
+	
+	switch(type) {
+		case INT: {
+			long l = PyInt_AsLong(arg);
+			PI_Broadcast(bundle, "%c%ld", type, l);
+			} break;
+		case FLOAT: {
+			double d = PyFloat_AsDouble(arg);
+			PI_Broadcast(bundle, "%c%lf", type, d);
+			} break;
+		case NONE:
+			PI_Broadcast(bundle, "%c", type);
+			break;
+		case STRING: {
+			char* string = PyString_AsString(arg);
+			size_t length = strlen(string);
+			PI_Broadcast(bundle, "%c%lu%*c", type, length, length, string);
+			} break;
+		case LIST:
+		case TUPLE: {
+			int i = 0;
+			size_t length = PySequence_Length(arg);
+			PI_Broadcast(bundle, "%c%lu", type, length);
+			
+			for(i=0; i<length; ++i) {
+				int success = broadcastArg(bundle, PySequence_GetItem(arg, i));
+				if(!success)
+					return 0;
+			}
+			
+			} break;
+		default:
+			PyErr_SetString(PyExc_TypeError, "unknown type in send list");
+			return 0;
+			break;
+	}
+
+	return 1;
+}
+
+bool_type PI_BroadcastVarArgs(PI_BUNDLE* bundle, ...) {
+	va_list list;
+	PyObject* args = 0L;
+	int i = 0;
+	size_t numArgs = 0;
+	
+	va_start(list, bundle);
+	args = va_arg(list, PyObject*);
+	va_end(list);
+	
+	numArgs = PyTuple_Size(args);
+	
+	/* @c args contains every python object provided after @c c. */
+	if(numArgs < 1 || (int)numArgs == -1) {
+		PyErr_SetString(PyExc_ValueError, "you must write at least one object");
+		return 0;
+	}
+	
+	for(i=0; i<numArgs; ++i) {
+		int success = broadcastArg(bundle, PyTuple_GetItem(args, i));
+		if(!success)
+			return 0;
+	}
+
+	return 1;
+}
+
+PyObject* PI_GatherItem(PI_BUNDLE* bundle) {
+	int i = 0;
+	int bundleSize = PI_GetBundleSize(bundle);
+	enum type* types = malloc(bundleSize * sizeof(enum type));
+	PyObject* obj = 0L;
+	
+	PI_Gather(bundle, "%c", &types[0]);
+	for(i=1; i<bundleSize; ++i) {
+		if(types[i] != types[i-1]) {
+			PyErr_SetString(PyExc_ValueError, "can't gather bundle because channels have different incoming datatypes");
+			return 0L;
+		}
+	}
+	
+	obj = PyList_New(bundleSize);
+	switch(types[0]) {
+		case INT: {
+			long* values = malloc(bundleSize * sizeof(long));
+			PI_Gather(bundle, "%ld", &values[0]);
+			for(i=0; i<bundleSize; ++i) {
+				PyList_SetItem(obj, i, PyInt_FromLong(values[i]));
+			}
+			free(values);
+			} break;
+		case FLOAT: {
+			double* values = malloc(bundleSize * sizeof(double));
+			PI_Gather(bundle, "%lf", &values[0]);
+			for(i=0; i<bundleSize; ++i) {
+				PyList_SetItem(obj, i, PyFloat_FromDouble(values[i]));
+			}
+			free(values);
+			} break;
+		case NONE: {
+			for(i=0; i<bundleSize; ++i) {
+				Py_INCREF(Py_None);
+				PyList_SetItem(obj, i, Py_None);
+			}
+			} break;
+		case STRING:
+		case LIST:
+		case TUPLE: 
+			PyErr_SetString(PyExc_TypeError, "only numbers, bools, and None may be gathered.");
+			break;
+		default:
+			PyErr_SetString(PyExc_TypeError, "unknown data type in channel");
+			break;
+	}
+	
+	return obj;
+}
+

@@ -54,20 +54,44 @@
 	Py_XDECREF((PyObject*)$1);
 }
 
+%typemap(in) (PI_CHANNEL *const array[], int size) {
+  if (PyList_Check($input)) {
+    $2 = PyList_Size($input);
+    int i = 0;
+    $1 = (PI_CHANNEL**) malloc(($2+1)*sizeof(PI_CHANNEL*));
+    for (i = 0; i < $2; ++i) {
+      PyObject *o = PyList_GetItem($input,i);
+      if((SWIG_ConvertPtr(o, (void**)&$1[i], $*1_descriptor, 0)) == -1) {
+        PyErr_SetString(PyExc_TypeError, "list must contain channels");
+        free($1);
+        return NULL;
+      }
+    }
+    $1[i] = 0;
+  } else {
+    PyErr_SetString(PyExc_TypeError,"not a list");
+    return NULL;
+  }
+}
+
+%typemap(freearg) (PI_CHANNEL* const array[], int size) {
+	free($1);
+}
+
 %rename(PI_Configure_) wrap_PI_Configure;
 %rename(PI_Write_) PI_WriteVarArgs;
 %rename(PI_Read_) PI_ReadItem;
 %rename(PI_Read_) PI_ReadArray;
-//%rename(PI_Broadcast_) PI_BroadcastVarArgs;
-//%rename(PI_Gather_) PI_GatherItem;
-//%rename(PI_Gather_) PI_GatherArray;
+%rename(PI_Broadcast_) PI_BroadcastVarArgs;
+#%rename(PI_Gather_) PI_GatherItem;
+#%rename(PI_Gather_) PI_GatherArray;
 %rename(PI_CreateProcess_) wrap_PI_CreateProcess;
 
 %ignore PI_Configure_;
 %ignore PI_Read_;
 %ignore PI_Write_;
-//%ignore PI_Broadcast_;
-//%ignore PI_Gather_;
+%ignore PI_Broadcast_;
+%ignore PI_Gather_;
 %ignore PI_CreateProcess_;
 
 %{

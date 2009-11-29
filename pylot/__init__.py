@@ -24,7 +24,6 @@ channelHasData = pylot.PI_ChannelHasData_
 getBundleChannel = pylot.PI_GetBundleChannel_
 getBundleSize = pylot.PI_GetBundleSize_
 broadcast = pylot.PI_Broadcast_
-gather = pylot.PI_Gather_
 startTime = pylot.PI_StartTime
 endTime = pylot.PI_EndTime
 log = pylot.PI_Log_
@@ -33,3 +32,13 @@ abort = pylot.PI_Abort
 
 write = pylot.PI_Write_
 read = pylot.PI_Read_
+
+def gather(bundle, n=1):
+	if n < 1:
+		raise ValueError("you must gather at least one element")
+	
+	if n == 1:
+		return pylot.PI_GatherItem(bundle);
+	else:
+		return zip(*[gather(bundle) for i in range(n)])
+
