@@ -42,6 +42,8 @@
 	$result = $1 ? SWIG_Py_Void() : 0L;
 }
 
+%apply int *OUTPUT { int *rank, int *worldsize };
+
 //for some reason, SWIG won't break the varargs apart properly
 //it leaves the first arg in @c args instead of putting it in @c varargs
 //so i need to construct my own @c varargs variable

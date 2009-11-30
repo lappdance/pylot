@@ -2,24 +2,37 @@
 #include<stdarg.h>
 #include<mpi.h>
 
-void enterBenchMode(char** argv) {
-	int i = 0;
-	while(argv[i])
-		++i;
+bool_type enterBenchMode(char** argv, int* rank, int* N) {
+	int initialized = 0;
 	
-	MPI_Init(&i, &argv);
+	MPI_Initialized(&initialized);
+	if(!initialized) {
+		int i = 0;
+		while(argv[i])
+			++i;
+	
+		MPI_Init(&i, &argv);
+		MPI_Comm_rank(MPI_COMM_WORLD, rank);
+		MPI_Comm_size(MPI_COMM_WORLD, N);
+	} else {
+		PyErr_SetString(PyExc_EnvironmentError, "you cannot try to enter bench"
+			"mode more than once, or enter it after Pilot has been configured.");
+	}
+	
+	return !initialized;
 }
 
 void exitBenchMode() {
 	MPI_Finalize();
 }
 
-int wrap_PI_Configure(char** argv) {
+void wrap_PI_Configure(char** argv, int* rank, int* N) {
 	int i = 0;
 	while(argv[i])
 		++i;
 	
-	return PI_Configure_(&i, &argv);
+	*N = PI_Configure_(&i, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, rank);
 }
 
 struct Context {

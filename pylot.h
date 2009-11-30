@@ -18,8 +18,12 @@ typedef int bool_type;
  Put Pilot into "bench mode".
  In bench mode, Pilot can be stopped and restarted without reinitializing the
  entire program.
+ @param [in] argv Commandline arguments. This array is a copy of @c sys.argv,
+                  and so the original is not modified.
+ @param [out] rank This process's rank
+ @param [out] worldsize The total number of available processes
 **/
-void enterBenchMode(char** argv);
+bool_type enterBenchMode(char** argv, int* rank, int* worldsize);
 /** Exit "bench mode" and return to normal behaviour. */
 void exitBenchMode();
 
@@ -27,9 +31,10 @@ void exitBenchMode();
  Wrapper func for PI_Configure. @c argv is not modified.
  @param [in] argv Command-line arguments. This array is a copy of @c sys.argv,
                   and so the original is not modified.
- @return The number of MPI processes available.
+  @param [out] rank This process's rank
+ @param [out] worldsize The total number of available processes
 **/
-int wrap_PI_Configure(char** argv);
+void wrap_PI_Configure(char** argv, int* rank, int* worldsize);
 
 /**
  Wrapper func to allow Python objects to be used as callbacks. SWIG won't do this

@@ -4,6 +4,9 @@ _libmpi = ctypes.CDLL("libmpi.so", ctypes.RTLD_GLOBAL)
 import pylot
 import sys
 
+mpi_rank = 0
+mpi_worldsize = 0
+
 MAIN = None
 BROADCAST = pylot.PI_BROADCAST
 GATHER = pylot.PI_GATHER
@@ -12,12 +15,17 @@ SAME = pylot.PI_SAME
 REVERSE = pylot.PI_REVERSE
 
 def enterBenchMode():
-	pylot.enterBenchMode(sys.argv)
+	global mpi_rank, mpi_worldsize
+	
+	mpi_rank, mpi_worldsize = pylot.enterBenchMode(sys.argv)
+	
 	
 exitBenchMode = pylot.exitBenchMode
 
 def configure():
-	pylot.PI_Configure_(sys.argv)
+	global mpi_rank, mpi_worldsize
+	
+	mpi_rank, mpi_worldsize = pylot.PI_Configure_(sys.argv)
 
 createProcess = pylot.PI_CreateProcess_
 createChannel = pylot.PI_CreateChannel_
