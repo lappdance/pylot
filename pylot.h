@@ -47,7 +47,7 @@ void wrap_PI_Configure(char** argv, int* rank, int* worldsize);
  @return A handle to the process. The process will not start until @c PI_StartAll
          is called.
 **/
-PI_PROCESS* wrap_PI_CreateProcess(PyObject* function, int index, PyObject* data);
+PI_PROCESS* wrap_PI_CreateProcess(PyObject* callback, int index, PyObject* data);
 
 /**
  Write items to a channel. This method does not yet support extracting items from

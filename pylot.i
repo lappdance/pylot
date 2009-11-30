@@ -28,7 +28,7 @@
 	free($1);
 }
 
-%typemap(check) (PyObject* function) {
+%typemap(check) (PyObject* callback) {
 	if(!PyCallable_Check($1))
 		SWIG_exception_fail(SWIG_ValueError, "callback function must be a functor");
 }
@@ -36,6 +36,11 @@
 %typemap(check) (PI_CHANNEL*) {
 	if(!$1)
 		SWIG_exception_fail(SWIG_ValueError, "channel cannot be null: did you forget to call it global?");
+}
+
+%typemap(check) (PI_BUNDLE*) {
+	if(!$1)
+		SWIG_exception_fail(SWIG_ValueError, "bundles cannot be null");
 }
 
 %typemap(out) (bool_type) {
