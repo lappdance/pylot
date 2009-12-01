@@ -43,12 +43,11 @@ struct Context {
 int work_func(int index, void* pv) {
 	struct Context* context = (struct Context*)pv;
 	
-	//i have to add @c index to the tuple before calling the other func
-	
 	PyObject* tuple = PyTuple_Pack(2, PyInt_FromLong(index), context->data);
-	if(!tuple)
+	if(!tuple) {
 		PyErr_Print();
-
+		return 0;
+	}
 	
 	PyObject* result = PyObject_Call(context->func, tuple, 0L);
 	if(!result)
@@ -72,7 +71,7 @@ PI_PROCESS* wrap_PI_CreateProcess(PyObject* function, int index, PyObject* data)
 	Py_INCREF(c->func);
 	Py_INCREF(c->data);
 	
-	proc = PI_CreateProcess(work_func, index, c);
+	proc = PI_CreateProcess_(work_func, index, c);
 	
 	if(!proc) {
 		Py_DECREF(c->func);
@@ -259,18 +258,6 @@ PyObject* PI_ReadArray(PI_CHANNEL* c, int n) {
 abort:
 	Py_DECREF(list);
 	return 0L;
-}
-
-PyObject* echoargs(void* pv, ...) {
-	va_list list;
-	va_start(list, pv);
-	
-	PyObject* obj = va_arg(list, PyObject*);
-	Py_INCREF(obj);
-	
-	va_end(list);
-	
-	return obj;
 }
 
 bool_type broadcastArg(PI_BUNDLE* bundle, PyObject* arg) {	

@@ -1,63 +1,81 @@
-import ctypes
-_libmpi = ctypes.CDLL("libmpi.so", ctypes.RTLD_GLOBAL)
+import ctypes as _ctypes
+_libmpi = _ctypes.CDLL("libmpi.so", _ctypes.RTLD_GLOBAL)
 
-import pylot
-import sys
+import pylot as _pylot
+import sys as _sys
+import traceback as _traceback
+
+class _StackTrace:
+	def __init__(self, functor):
+		self.functor = functor
+	
+	def __call__(self, *args, **kwargs):
+		stack = _traceback.extract_stack()
+		filename, lineno, funcname, line = stack[-2]
+		_pylot.cvar.PI_CallerFile = filename
+		_pylot.cvar.PI_CallerLine = lineno
+		return self.functor(*args, **kwargs)
+
 
 mpi_rank = 0
 mpi_worldsize = 0
 
 MAIN = None
-BROADCAST = pylot.PI_BROADCAST
-GATHER = pylot.PI_GATHER
-SELECT = pylot.PI_SELECT
-SAME = pylot.PI_SAME
-REVERSE = pylot.PI_REVERSE
+BROADCAST = _pylot.PI_BROADCAST
+GATHER = _pylot.PI_GATHER
+SELECT = _pylot.PI_SELECT
+SAME = _pylot.PI_SAME
+REVERSE = _pylot.PI_REVERSE
 
+globals = _pylot.cvar
+
+@_StackTrace
 def enterBenchMode():
 	global mpi_rank, mpi_worldsize
 	
-	mpi_rank, mpi_worldsize = pylot.enterBenchMode(sys.argv)
+	mpi_rank, mpi_worldsize = _pylot.enterBenchMode(_sys.argv)
 	
 	
-exitBenchMode = pylot.exitBenchMode
+exitBenchMode = _StackTrace(_pylot.exitBenchMode)
 
+@_StackTrace
 def configure():
 	global mpi_rank, mpi_worldsize
 	
-	mpi_rank, mpi_worldsize = pylot.PI_Configure_(sys.argv)
+	mpi_rank, mpi_worldsize = _pylot.PI_Configure_(_sys.argv)
 
-createProcess = pylot.PI_CreateProcess_
-createChannel = pylot.PI_CreateChannel_
-createBundle = pylot.PI_CreateBundle_
-copyChannels = pylot.PI_CopyChannels_
-getName = pylot.PI_GetName_
-setName = pylot.PI_SetName_
-startAll = pylot.PI_StartAll_
-stopMain = pylot.PI_StopMain_
-select = pylot.PI_Select_
-trySelect = pylot.PI_TrySelect_
-channelHasData = pylot.PI_ChannelHasData_
-getBundleChannel = pylot.PI_GetBundleChannel_
-getBundleSize = pylot.PI_GetBundleSize_
+createProcess = _StackTrace(_pylot.PI_CreateProcess_)
+createChannel = _StackTrace(_pylot.PI_CreateChannel_)
+createBundle = _StackTrace(_pylot.PI_CreateBundle_)
+copyChannels = _StackTrace(_pylot.PI_CopyChannels_)
+getName = _StackTrace(_pylot.PI_GetName_)
+setName = _StackTrace(_pylot.PI_SetName_)
+startAll = _StackTrace(_pylot.PI_StartAll_)
+stopMain = _StackTrace(_pylot.PI_StopMain_)
+select = _StackTrace(_pylot.PI_Select_)
+trySelect = _StackTrace(_pylot.PI_TrySelect_)
+channelHasData = _StackTrace(_pylot.PI_ChannelHasData_)
+getBundleChannel = _StackTrace(_pylot.PI_GetBundleChannel_)
+getBundleSize = _StackTrace(_pylot.PI_GetBundleSize_)
 
-broadcast = pylot.PI_Broadcast_
+broadcast = _StackTrace(_pylot.PI_Broadcast_)
 
+@_StackTrace
 def gather(bundle, n=1):
 	if n < 1:
 		raise ValueError("you must gather at least one element")
 	
 	if n == 1:
-		return pylot.PI_GatherItem(bundle);
+		return _pylot.PI_GatherItem(bundle);
 	else:
 		return [gather(bundle) for i in range(n)]
 
-startTime = pylot.PI_StartTime
-endTime = pylot.PI_EndTime
-log = pylot.PI_Log_
-isLogging = pylot.PI_IsLogging
-abort = pylot.PI_Abort
+startTime = _pylot.PI_StartTime
+endTime = _pylot.PI_EndTime
+log = _StackTrace(_pylot.PI_Log_)
+isLogging = _pylot.PI_IsLogging
+abort = _pylot.PI_Abort
 
-write = pylot.PI_Write_
-read = pylot.PI_Read_
+write = _StackTrace(_pylot.PI_Write_)
+read = _StackTrace(_pylot.PI_Read_)
 

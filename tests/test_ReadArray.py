@@ -26,8 +26,8 @@ class TestWritingVarArgs(unittest.TestCase):
 		pylot.configure()
 		echoproc = pylot.createProcess(echoer, 0, None)
 
-		toEchoer = pylot.createChannel(None, echoproc)
-		fromEchoer = pylot.createChannel(echoproc, None)
+		toEchoer = pylot.createChannel(pylot.MAIN, echoproc)
+		fromEchoer = pylot.createChannel(echoproc, pylot.MAIN)
 
 		self.rank = pylot.startAll()
 	
@@ -149,6 +149,7 @@ class TestReadingVarArgs(unittest.TestCase):
 
 if __name__ == "__main__":
 	pylot.enterBenchMode()
+	pylot.globals.PI_QuietMode = 1
 
 	suite = unittest.TestSuite(map(unittest.TestLoader().loadTestsFromTestCase,
 		(TestWritingVarArgs, TestReadingVarArgs)

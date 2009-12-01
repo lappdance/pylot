@@ -149,6 +149,7 @@ class BlackHole:
 
 if __name__ == "__main__":
 	pylot.enterBenchMode()
+	pylot.globals.PI_QuietMode = 1
 	
 	suite = unittest.TestLoader().loadTestsFromTestCase(TestBasicTypes)
 	stream = BlackHole() if pylot.mpi_rank != 0 else sys.stderr

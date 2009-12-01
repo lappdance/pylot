@@ -60,6 +60,9 @@ def main():
 
 	pylot.stopMain(0)
 
+def foo():
+	pylot.createProcess(pylot.endTime, 0, 0)
+
 if __name__ == "__main__":
 	main()
 

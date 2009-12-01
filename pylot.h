@@ -83,8 +83,6 @@ PyObject* PI_ReadItem(PI_CHANNEL* c);
 **/
 PyObject* PI_ReadArray(PI_CHANNEL* c, int n);
 
-PyObject* echoargs(void* pv, ...);
-
 /**
  Broadcast arguments to multiple channels at once.
  @param [in] bundle The bundle of channels to write to
