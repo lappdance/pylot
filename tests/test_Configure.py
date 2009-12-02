@@ -1,40 +1,27 @@
 import unittest
 import sys
+import utils
 
 sys.path.append("..")
 import pylot
 
-def nothing(rank, void):
-	pass
-
-class TestBenchMode(unittest.TestCase):
+class TestRepeatedConfigures(unittest.TestCase):
+	def setUp(self):
+		pylot.configure()
+		
+	def testConfigure(self):
+		self.assertTrue(True)
 	
-	def testOne(self):
-		print "1"
-	
-	def testTwo(self):
-		print "2"
-
-def setUp(self):
-	print "up"
-	pylot.configure()
-	
-	pylot.createProcess(nothing, 0, None)
-	
-	pylot.startAll()
-
-def tearDown(self):
-	print "down"
-	pylot.stopMain(0)
+	def testConfigureAgain(self):
+		self.assertTrue(True)
 
 if __name__ == "__main__":
 	pylot.enterBenchMode()
+	pylot.globals.PI_QuietMode = 1
 	
-	setUp(None)
-	
-	unittest.main()
-	
-#	tearDown(None)
-	print "down"
-	pylot.stopMain(0)
+	suite = unittest.TestLoader().loadTestsFromTestCase(TestRepeatedConfigures)
+	stream = utils.BlackHole() if pylot.mpi_rank != 0 else sys.stderr
+	unittest.TextTestRunner(stream=stream, verbosity=2).run(suite)
+
+	pylot.exitBenchMode()
 

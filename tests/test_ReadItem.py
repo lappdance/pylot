@@ -1,5 +1,6 @@
 import unittest
 import sys
+import utils
 
 sys.path.append("..")
 import pylot
@@ -30,129 +31,87 @@ class TestBasicTypes(unittest.TestCase):
 	
 	def testInt(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = 42
-			pylot.write(toEchoer, sent)
-			echo = pylot.read(fromEchoer)
-		
-			self.assertEqual(sent, echo, "expected {0} but got {1}".format(sent, echo))
+			self.sendToEchoer(42)
 
 	def testFloat(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = 6.67428e-11
-			pylot.write(toEchoer, sent)
-			echo = pylot.read(fromEchoer)
-		
-			self.assertAlmostEqual(sent, echo, 7, "expected {0} but got {1}".format(sent, echo))
+			self.sendToEchoer(6.67428e-11)
 	
 	def testBool(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = True
-			pylot.write(toEchoer, sent)
-			echo = pylot.read(fromEchoer)
-		
-			self.assertEqual(sent, echo, "expected {0} but got {1}".format(sent, echo))
+			self.sendToEchoer(True)
 	
 	def testNone(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = None
-			pylot.write(toEchoer, sent)
-			echo = pylot.read(fromEchoer)
-		
-			self.assertEqual(sent, echo, "expected {0} but got {1}".format(sent, echo))
+			self.sendToEchoer(None)
 	
 	def testString(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = "words words words"
-			pylot.write(toEchoer, sent)
-			echo = pylot.read(fromEchoer)
-		
-			self.assertEqual(sent, echo, "expected {0} but got {1}".format(sent, echo))
+			self.sendToEchoer("words words words")
 
 	def testListOfInts(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = [1, 2, 3]
-			pylot.write(toEchoer, sent)
-			echo = pylot.read(fromEchoer)
-		
-			self.assertEqual(sent, echo, "expected {0} but got {1}".format(sent, echo))
-			self.assertEqual(type(sent), type(echo), "expected {0} but got {1}".format(type(sent), type(echo)))
+			l = [1, 2, 3]
+			self.sendToEchoer(l)
 	
 	def testTupleOfChars(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = ('a', 'b')
-			pylot.write(toEchoer, sent)
-			echo = pylot.read(fromEchoer)
-		
-			self.assertEqual(sent, echo, "expected {0} but got {1}".format(sent, echo))
-			self.assertEqual(type(sent), type(echo), "expected {0} but got {1}".format(type(sent), type(echo)))
+			t = ('a', 'b')
+			self.sendToEchoer(t)
 
 	def testListOfDifferentTypes(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = [1, None, 6.7, "nothing"]
-			pylot.write(toEchoer, sent)
-			echo = pylot.read(fromEchoer)
-		
-			self.assertEqual(sent, echo, "expected {0} but got {1}".format(sent, echo))
+			l = [1, None, 6.7, "nothing"]
+			self.sendToEchoer(l)
 
 	def testListOfTuples(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = [(1, 2), (5, 6)]
-			pylot.write(toEchoer, sent)
-			echo = pylot.read(fromEchoer)
-		
-			self.assertEqual(sent, echo, "expected {0} but got {1}".format(sent, echo))
+			l = [(1, "ab"), (None, 6.5)]
+			self.sendToEchoer(l)
 
 	def testDict(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
-			sent = { "key" : "value" }
-			self.assertRaises(TypeError, pylot.write, toEchoer, sent)
-			
-			#the reader process is still waiting for us to send it something
-			#so just give it a null
-			pylot.write(toEchoer, None)
-			#the echoer is going to echo the value back, and it'll be left in the
-			#channel if we don't clear it out
-			#stopmain() is called at the end of this test, which deletes the channel,
-			#but deleting the Pilot channel doesn't affect the MPI communication
-			#layer
-			pylot.read(fromEchoer)
+			d = { "key" : "value" }
+			self.failToSendToEchoer(d, TypeError)
 	
 	def testStruct(self):
 		if self.rank == 0:
-			global toEchoer, fromEchoer
 			class C:
 				pass
 		
-			sent = C()
-			sent.index = 0
+			c = C()
+			c.index = 0
 
-			self.assertRaises(TypeError, pylot.write, toEchoer, sent)
-			
-			pylot.write(toEchoer, None)
-			pylot.read(fromEchoer)
-
-class BlackHole:
-	def write(self, *args):
-		pass
-	def flush(self):
-		pass
+			self.failToSendToEchoer(c, TypeError)
+	
+	def sendToEchoer(self, data):
+		global toEchoer, fromEchoer
+		pylot.write(toEchoer, data)
+		
+		echo = pylot.read(fromEchoer)	
+		self.assertEqual(data, echo, "expected {0} but got {1}".format(data, echo))
+	
+	def failToSendToEchoer(self, data, expectedError):
+		global toEchoer, fromEchoer
+		
+		self.assertRaises(expectedError, pylot.write, toEchoer, data)
+		
+		#the reader process is still waiting for us to send it something
+		#so just give it a null
+		pylot.write(toEchoer, None)
+		#the echoer is going to echo the value back, and it'll be left in the
+		#channel if we don't clear it out
+		#stopmain() is called at the end of this test, which deletes the channel,
+		#but deleting the Pilot channel doesn't affect the MPI communication
+		#layer
+		pylot.read(fromEchoer)
 
 if __name__ == "__main__":
 	pylot.enterBenchMode()
 	pylot.globals.PI_QuietMode = 1
 	
 	suite = unittest.TestLoader().loadTestsFromTestCase(TestBasicTypes)
-	stream = BlackHole() if pylot.mpi_rank != 0 else sys.stderr
+	stream = utils.BlackHole() if pylot.mpi_rank != 0 else sys.stderr
 	unittest.TextTestRunner(stream=stream, verbosity=2).run(suite)
 
 	pylot.exitBenchMode()

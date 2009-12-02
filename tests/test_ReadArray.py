@@ -145,6 +145,20 @@ class TestReadingVarArgs(unittest.TestCase):
 			pylot.read(fromProducer)
 			
 			self.assertFalse(pylot.channelHasData(fromProducer))
+	
+	def testReadReturnsLists(self):
+		if self.rank == 0:
+			global fromProducer
+			
+			single = pylot.read(fromProdocer)
+			multiple = pylot.read(fromProducer, 1)
+			
+			self.assertTrue(isinstance(single, int))
+			self.assertTrue(isinstance(multiple, list))
+			self.assertEquals(1, len(multiple))
+			self.assertEquals(single, multiple[0])
+			
+			pylot.read(fromProducer)
 		
 
 if __name__ == "__main__":

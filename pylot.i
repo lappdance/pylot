@@ -1,6 +1,10 @@
 %module pylot
 %include "typemaps.i"
 
+%typemap(arginit) SWIGTYPE* {
+	$1 = 0L;
+}
+
 %typemap(in) (char** argv) {
   /* Check if is a list */
   if (PyList_Check($input)) {
@@ -82,7 +86,8 @@
 }
 
 %typemap(freearg) (PI_CHANNEL* const array[], int size) {
-	free($1);
+	if($1)
+		free($1);
 }
 
 %rename(PI_Configure_) wrap_PI_Configure;

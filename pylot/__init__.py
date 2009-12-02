@@ -30,19 +30,19 @@ REVERSE = _pylot.PI_REVERSE
 globals = _pylot.cvar
 
 @_StackTrace
-def enterBenchMode():
+def enterBenchMode(argv=_sys.argv):
 	global mpi_rank, mpi_worldsize
 	
-	mpi_rank, mpi_worldsize = _pylot.enterBenchMode(_sys.argv)
+	mpi_rank, mpi_worldsize = _pylot.enterBenchMode(argv)
 	
 	
 exitBenchMode = _StackTrace(_pylot.exitBenchMode)
 
 @_StackTrace
-def configure():
+def configure(argv=_sys.argv):
 	global mpi_rank, mpi_worldsize
 	
-	mpi_rank, mpi_worldsize = _pylot.PI_Configure_(_sys.argv)
+	mpi_rank, mpi_worldsize = _pylot.PI_Configure_(argv)
 
 createProcess = _StackTrace(_pylot.PI_CreateProcess_)
 createChannel = _StackTrace(_pylot.PI_CreateChannel_)
