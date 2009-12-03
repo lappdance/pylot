@@ -330,21 +330,35 @@ bool_type PI_BroadcastVarArgs(PI_BUNDLE* bundle, ...) {
 }
 
 PyObject* PI_GatherItem(PI_BUNDLE* bundle) {
+	//memory alignment nonsense
+	//enums in C are @c ints, and I can't set them to be @c chars like I can in C++
+	//I call type a char when I write it; PI_Write and PI_Read align the next
+	//variable on a dword boundary for me, so the "char"s are still spaced an int's
+	//width apart. Through dumb luck my plan actually works.
+	//mpi gather doesn't do this. I'm writing chars, mpi is going to gather chars,
+	//and chars don't have to be aligned, so the next char gathered goes on a byte
+	//boundary, not a dword.
+	//I have two options: call enum type an int when I send it, and ++ the overhead
+	//* 3, or leave them as chars and only deal with the alignment issues here.
+	//I will leave them as chars.
+
 	int i = 0;
 	int bundleSize = PI_GetBundleSize(bundle);
-	enum type* types = malloc(bundleSize * sizeof(enum type));
+	char* typeChars = malloc(bundleSize * sizeof(char));
 	PyObject* obj = 0L;
+	enum type type = 0;
 	
-	PI_Gather(bundle, "%c", &types[0]);
+	PI_Gather(bundle, "%c", &typeChars[0]);
 	for(i=1; i<bundleSize; ++i) {
-		if(types[i] != types[i-1]) {
+		if(typeChars[i] != typeChars[i-1]) {
 			PyErr_SetString(PyExc_ValueError, "can't gather bundle because channels have different incoming datatypes");
 			return 0L;
 		}
 	}
 	
 	obj = PyList_New(bundleSize);
-	switch(types[0]) {
+	type = (enum type)typeChars[0];
+	switch(type) {
 		case INT: {
 			long* values = malloc(bundleSize * sizeof(long));
 			PI_Gather(bundle, "%ld", &values[0]);
@@ -371,12 +385,40 @@ PyObject* PI_GatherItem(PI_BUNDLE* bundle) {
 		case LIST:
 		case TUPLE: 
 			PyErr_SetString(PyExc_TypeError, "only numbers, bools, and None may be gathered.");
+			Py_XDECREF(obj);
+			obj = 0L;
 			break;
 		default:
 			PyErr_SetString(PyExc_TypeError, "unknown data type in channel");
+			Py_XDECREF(obj);
+			obj = 0L;
 			break;
 	}
 	
 	return obj;
+}
+
+PyObject* PI_GatherArray(PI_BUNDLE* b, int n) {
+	PyObject* list = 0L;
+	int i = 0;
+	
+	if(n < 1) {
+		PyErr_SetString(PyExc_ValueError, "you must read at least one item from a bundle");
+		return 0L;
+	}
+	
+	list = PyList_New(n);
+	for(i=0; i<n; ++i) {
+		PyObject* item = PI_GatherItem(b);
+		if(!item)
+			goto abort;
+		
+		PyList_SetItem(list, i, item);
+	}
+	
+	return list;
+abort:
+	Py_DECREF(list);
+	return 0L;
 }
 

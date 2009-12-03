@@ -25,6 +25,7 @@ def loadTests():
 if __name__ == "__main__":
 	pylot.enterBenchMode()
 	pylot.globals.PI_QuietMode = 1
+	pylot.globals.PI_OnErrorReturn = 1
 
 	suite = loadTests()
 	

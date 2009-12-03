@@ -95,8 +95,8 @@
 %rename(PI_Read_) PI_ReadItem;
 %rename(PI_Read_) PI_ReadArray;
 %rename(PI_Broadcast_) PI_BroadcastVarArgs;
-#%rename(PI_Gather_) PI_GatherItem;
-#%rename(PI_Gather_) PI_GatherArray;
+%rename(PI_Gather_) PI_GatherItem;
+%rename(PI_Gather_) PI_GatherArray;
 %rename(PI_CreateProcess_) wrap_PI_CreateProcess;
 
 %ignore PI_Configure_;

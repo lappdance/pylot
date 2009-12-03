@@ -99,5 +99,16 @@ bool_type PI_BroadcastVarArgs(PI_BUNDLE* bundle, ...);
 **/
 PyObject* PI_GatherItem(PI_BUNDLE* bundle);
 
+/**
+ Read from multiple channels at once.
+ At the moment, only numbers and @c None can be gathered this way; strings and
+ lists must be read individually from each channel.
+ Each element in the returned array matches a call to @c PI_GatherItem.
+ @param [in] bundle The bundle to read from.
+ @param [in] n The number of items to read from each channel
+ @return A 2-D list
+**/
+PyObject* PI_GatherArray(PI_BUNDLE* bundle, int n);
+
 #endif //PYLOT_INCLUDE_PYLOT_H
 

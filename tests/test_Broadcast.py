@@ -13,9 +13,7 @@ def echoSingle(index, channelInfo):
 	pylot.write(channelInfo.out_, pylot.read(channelInfo.in_))
 
 class TestBroadcastSingle(unittest.TestCase):
-	def setUp(self):
-		global toES
-		
+	def setUp(self):		
 		self.in_ = []
 		self.out_ = []
 		

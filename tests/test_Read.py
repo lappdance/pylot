@@ -67,8 +67,8 @@ class TestReadingVarArgs(unittest.TestCase):
 			single = pylot.read(fromProducer)
 			multiple = pylot.read(fromProducer, 1)
 			
-			self.assertTrue(isinstance(single, int))
-			self.assertTrue(isinstance(multiple, list))
+			self.assertEquals(int, type(single))
+			self.assertEquals(list, type(multiple))
 			self.assertEquals(1, len(multiple))
 			self.assertEquals(single, multiple[0])
 			

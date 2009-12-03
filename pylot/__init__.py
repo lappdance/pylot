@@ -59,16 +59,7 @@ getBundleChannel = _StackTrace(_pylot.PI_GetBundleChannel_)
 getBundleSize = _StackTrace(_pylot.PI_GetBundleSize_)
 
 broadcast = _StackTrace(_pylot.PI_Broadcast_)
-
-@_StackTrace
-def gather(bundle, n=1):
-	if n < 1:
-		raise ValueError("you must gather at least one element")
-	
-	if n == 1:
-		return _pylot.PI_GatherItem(bundle);
-	else:
-		return [gather(bundle) for i in range(n)]
+gather = _StackTrace(_pylot.PI_Gather_)
 
 startTime = _pylot.PI_StartTime
 endTime = _pylot.PI_EndTime
