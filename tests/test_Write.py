@@ -89,7 +89,7 @@ class TestWritingBasicTypes(unittest.TestCase):
 		pylot.write(toEchoer, data)
 		
 		echo = pylot.read(fromEchoer)	
-		self.assertEqual(data, echo, "expected {0} but got {1}".format(data, echo))
+		self.assertEqual(data, echo)
 	
 	def failToSendToEchoer(self, data, expectedError):
 		global toEchoer, fromEchoer
@@ -178,7 +178,7 @@ class TestWritingVarArgs(unittest.TestCase):
 		if self.rank == 0:
 			global toEchoer, fromEchoer
 			
-			l = [3.14, 6.67, 2.13]
+			l = [3.1, 6.4, 2.9]
 			pylot.write(toEchoer, 3, *l)
 			values = pylot.read(fromEchoer, 3)
 			

@@ -80,7 +80,7 @@ class TestBroadcastSingle(unittest.TestCase):
 		
 		for echoer in self.in_:
 			echo = pylot.read(echoer)	
-			self.assertEqual(data, echo, "expected {0} but got {1}".format(data, echo))
+			self.assertEqual(data, echo)
 	
 	def failToSendToEchoer(self, data, expectedError):
 		self.assertRaises(expectedError, pylot.broadcast, self.echoers, data)
