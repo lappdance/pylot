@@ -35,7 +35,7 @@ class TestWritingBasicTypes(unittest.TestCase):
 
 	def testFloat(self):
 		if self.rank == 0:
-			self.sendToEchoer(6.67428e-11)
+			self.sendToEchoer(6.67428)
 	
 	def testBool(self):
 		if self.rank == 0:
@@ -178,7 +178,7 @@ class TestWritingVarArgs(unittest.TestCase):
 		if self.rank == 0:
 			global toEchoer, fromEchoer
 			
-			l = [3.1, 6.4, 2.9]
+			l = [3.14, 6.67, 2.13]
 			pylot.write(toEchoer, 3, *l)
 			values = pylot.read(fromEchoer, 3)
 			
