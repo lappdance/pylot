@@ -12,10 +12,6 @@ class ChannelInfo:
 def echoSingle(index, channelInfo):
 	pylot.write(channelInfo.out_, pylot.read(channelInfo.in_))
 
-def echoMany(index, data):
-	n = pylot.read(channelInfo.in_)
-	pylot.write(channelInfo.out_, *pylot.read(channelInfo.in_, n))
-
 class TestBroadcastSingle(unittest.TestCase):
 	def setUp(self):
 		global toES
@@ -102,18 +98,107 @@ class TestBroadcastSingle(unittest.TestCase):
 		for echoer in self.in_:
 			pylot.read(echoer)
 
-class TestBroadcastMultiple(unittest.TestCase):
-	pass
+def echoMany(index, channelInfo):
+	n = pylot.read(channelInfo.in_)
+	pylot.write(channelInfo.out_, *pylot.read(channelInfo.in_, n))
+
+class TestBroadcastVarArgs(unittest.TestCase):
+	def setUp(self):
+		global toES
+		
+		self.in_ = []
+		self.out_ = []
+		
+		pylot.configure()
+		
+		for n in range(pylot.mpi_worldsize - 1):
+			info = ChannelInfo()
+			
+			echoer = pylot.createProcess(echoMany, n, info)
+			out = pylot.createChannel(None, echoer)
+			self.out_.append(out)
+			
+			in_ = pylot.createChannel(echoer, None)
+			self.in_.append(in_)
+			
+			info.in_ = out
+			info.out_ = in_
+
+		self.echoers = pylot.createBundle(pylot.BROADCAST, self.out_)
+		
+		self.rank = pylot.startAll()
+	
+	def tearDown(self):
+		if self.rank == 0:
+			pylot.stopMain(0)
+	
+	def testOneItemWithoutVarArgs(self):
+		if self.rank == 0:			
+			pylot.broadcast(self.echoers, 1)
+			pylot.broadcast(self.echoers, 6.7)
+
+			for echoer in self.in_:
+				values = pylot.read(echoer, 1)
+	
+				self.assertEqual(1, len(values))
+				self.assertEqual(6.7, values[0])
+	
+	def testOneItemWithVarArgs(self):
+		if self.rank == 0:			
+			pylot.broadcast(self.echoers, 1, 44)
+
+			for echoer in self.in_:
+				values = pylot.read(echoer, 1)
+			
+				self.assertEqual(1, len(values))
+				self.assertEqual(44, values[0])
+	
+	def testThreeItems(self):
+		if self.rank == 0:			
+			pylot.broadcast(self.echoers, 3, "nothing", None, -5)
+
+			for echoer in self.in_:
+				values = pylot.read(echoer, 3)
+			
+				self.assertEqual(3, len(values))
+				self.assertEqual("nothing", values[0])
+				self.assertEqual(None, values[1])
+				self.assertEqual(-5, values[2])
+			
+	def testListIsStillOneItem(self):
+		if self.rank == 0:			
+			l = [1, 2, 3]
+			pylot.broadcast(self.echoers, 1, l)
+
+			for echoer in self.in_:
+				values = pylot.read(echoer, 1)
+			
+				self.assertEqual(1, len(values))
+				self.assertNotEqual(l, values)
+				self.assertEqual(l, values[0])
+
+	def testExplodedListIsMoreThanOneItem(self):
+		if self.rank == 0:
+			l = [3.14, 6.67, 2.13]
+			pylot.broadcast(self.echoers, 3, *l)
+			
+			for echoer in self.in_:
+				values = pylot.read(echoer, 3)
+			
+				self.assertEquals(3, len(values))
+				self.assertEquals(l, values)
+				self.assertEqual(3.14, values[0])
+				self.assertEqual(6.67, values[1])
+				self.assertEqual(2.13, values[2])
 
 if __name__ == "__main__":
 	pylot.enterBenchMode()
 	pylot.globals.PI_QuietMode = 1
 	
-	import os, time
-	print os.getpid(), pylot.mpi_rank
-#	time.sleep(19)
+	suite = unittest.TestSuite(map(unittest.TestLoader().loadTestsFromTestCase,
+		(TestBroadcastSingle, TestBroadcastVarArgs)
+	))
 	
-	suite = unittest.TestLoader().loadTestsFromTestCase(TestBroadcastSingle)
 	stream = utils.BlackHole() if pylot.mpi_rank != 0 else sys.stderr
 	unittest.TextTestRunner(stream=stream, verbosity=2).run(suite)
 
