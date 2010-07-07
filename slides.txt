@@ -1,0 +1,35 @@
+//slide
+chance to use mpi at fanshawe. ended badly. pilot actually nice to use
+use pilot to explore mpi environment.
+have nice wrapper for mpi, now need nice wrapper for C
+
+//slide
+objectives
+	port pilot api to python
+		not reimpl in python, wrap existing pilot functions
+		swig
+	unit tests to prove python layer works properly
+	demo program to show off working code
+
+//slide
+api comparison: most functions move from PI_* to pylot.*
+also added member functions to bundles & channels
+
+//slide
+api comparison: read & write, broadcast & gather with varargs
+
+//slide
+objectives
+	python api -- done!
+	unit tests
+		pyunit, cunit
+	demo program -- not happening
+
+//slide
+objectives
+	python api -- done!
+	unit tests -- in progress
+	demo program
+		md5sum of series of files
+		compare against C impl if have time
+
